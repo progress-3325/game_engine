@@ -4,6 +4,7 @@
 #include <chrono>
 #include <cstring>
 #include <fstream>
+#include <unordered_map>
 
 
 namespace cspace
@@ -66,7 +67,7 @@ namespace cspace
 
         std::cout << cout_msg << std::endl;
 
-        
+        logged << ss_msg << "\n";
     }
 
     void logger::set_save_location(const char* loc)
