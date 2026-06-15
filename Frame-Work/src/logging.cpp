@@ -1,4 +1,5 @@
 #include "logging.h"
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -74,6 +75,12 @@ namespace cspace
         std::cout << cout_msg << std::endl;
 
         logged << ss_msg << "\n";
+
+        if (c == L_CODE::C_ERROR)
+        {
+            save();
+            exit(EXIT_FAILURE);
+        }
     }
 
     void logger::set_save_location(const char* loc)
