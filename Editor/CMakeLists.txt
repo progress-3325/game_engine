@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(Editor
-    src/main.cpp
+    src/main.cpp src/application.cpp include/application.h
 )
 
 

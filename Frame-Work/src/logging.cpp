@@ -1,5 +1,6 @@
 #include "logging.h"
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <chrono>
 #include <cstring>
@@ -11,6 +12,8 @@ namespace cspace
 {
     bool logger::debug = true;
     std::mutex logger::log_mutex;
+    std::stringstream logger::logged;
+    char* logger::save_location = new char[1]{ '\0' };
 
     namespace detail
     {
