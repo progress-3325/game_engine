@@ -1,9 +1,10 @@
 #pragma once
 #include <sstream>
+#include "core.h"
 
 namespace cspace
 {
-    enum class L_CODE : unsigned char
+    enum class L_CODE : uint8_t
     {
         C_INFO = 0, C_WARN, C_ERROR, C_DEBUG, C_RESET
     };
