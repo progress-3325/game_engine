@@ -13,3 +13,12 @@ target_include_directories(Frame-Work
     PUBLIC
         include
 )
+
+find_package(glfw3 REQUIRED)
+
+
+target_link_libraries(Frame-Work
+    PUBLIC
+        glfw
+)
+message(STATUS "GLFW FOUND")
