@@ -10,7 +10,8 @@
 namespace cspace
 {
     bool logger::debug = true;
-    
+    std::mutex logger::log_mutex;
+
     namespace detail
     {
         const std::unordered_map<L_CODE, const char*> color_codes = {
@@ -58,6 +59,8 @@ namespace cspace
 
     void logger::log(const char* msg, const L_CODE& c)
     {
+        std::lock_guard<std::mutex> guard(log_mutex);
+
         if (!debug && c == L_CODE::C_DEBUG) return;
         std::string cout_msg = std::string(detail::color_codes.at(c)) + detail::format_time<seconds>(detail::get_time<seconds>()) + 
              std::string(msg) + std::string(detail::color_codes.at(L_CODE::C_RESET));
@@ -72,12 +75,16 @@ namespace cspace
 
     void logger::set_save_location(const char* loc)
     {
+        std::lock_guard<std::mutex> guard(log_mutex);
+        delete[] save_location;
         save_location = new char[strlen(loc) + 1];
         strcpy(save_location, loc);
+        save_location[strlen(loc)] = '\0';
     }
 
     void logger::save()
     {
+        std::lock_guard<std::mutex> guard(log_mutex);
         std::ofstream file(std::string(save_location) + detail::format_time<seconds>(detail::get_time<seconds>()) + std::string(".log"), 
             std::ios_base::out);
 

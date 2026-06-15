@@ -1,6 +1,7 @@
 #pragma once
 #include <sstream>
 #include "core.h"
+#include <mutex>
 
 namespace cspace
 {
@@ -21,5 +22,6 @@ namespace cspace
         static char* save_location;
     private:
         static std::stringstream logged;
+        static std::mutex log_mutex;       
     };
 }
