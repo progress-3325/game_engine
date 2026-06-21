@@ -16,9 +16,11 @@ target_include_directories(Editor
 )
 
 find_package(glfw3 REQUIRED)
+find_package(OpenGL REQUIRED)
 
 target_link_libraries(Editor
     PRIVATE
         Frame-Work
         glfw
+        OpenGL::GL
 )

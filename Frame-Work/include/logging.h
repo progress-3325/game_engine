@@ -3,11 +3,12 @@
 #include "core.h"
 #include <mutex>
 
-namespace cspace
+namespace cs
 {
     enum class L_CODE : uint8_t
     {
-        C_INFO = 0, C_WARN, C_ERROR, C_DEBUG, C_RESET
+        C_INFO = 0, C_WARN, C_DEBUG, C_RESET,
+        C_ERROR, C_ERROR_CONTINUE
     };
 
     class logger

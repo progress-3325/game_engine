@@ -1,6 +1,6 @@
 #pragma once
 
-namespace cspace
+namespace cs
 {
     using uint8_t = unsigned char;
     using uint16_t = unsigned short;

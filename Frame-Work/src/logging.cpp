@@ -9,29 +9,31 @@
 #include <unordered_map>
 
 
-namespace cspace
+namespace cs
 {
     bool logger::debug = true;
     std::mutex logger::log_mutex;
     std::stringstream logger::logged;
-    char* logger::save_location = new char[1]{ '\0' };
+    char* logger::save_location = NULL;
 
     namespace detail
     {
         const std::unordered_map<L_CODE, const char*> color_codes = {
             {L_CODE::C_INFO, "\033[37;1m"},
             {L_CODE::C_WARN, "\033[33;1m"},
-            {L_CODE::C_ERROR, "\033[31;1m"},
             {L_CODE::C_DEBUG, "\033[36;1m"},
-            {L_CODE::C_RESET, "\033[0;21m"}
+            {L_CODE::C_RESET, "\033[0;21m"},
+            {L_CODE::C_ERROR, "\033[31;1m"},
+            {L_CODE::C_ERROR_CONTINUE, "\033[31;1m"},
         };
 
         const std::unordered_map<L_CODE, const char*> string_codes = {
             {L_CODE::C_INFO, "<INFO>"},
             {L_CODE::C_WARN, "<WARN>"},
-            {L_CODE::C_ERROR, "<ERROR>"},
             {L_CODE::C_DEBUG, "<DEBUG>"},
-            {L_CODE::C_RESET, "<END_OF_STATEMENT"}
+            {L_CODE::C_RESET, "<END_OF_STATEMENT"},
+            {L_CODE::C_ERROR, "<ERROR>"},
+            {L_CODE::C_ERROR_CONTINUE, "<ERROR>"},
         };
 
         template<class duration>
@@ -66,6 +68,7 @@ namespace cspace
         std::lock_guard<std::mutex> guard(log_mutex);
 
         if (!debug && c == L_CODE::C_DEBUG) return;
+
         std::string cout_msg = std::string(detail::color_codes.at(c)) + detail::format_time<seconds>(detail::get_time<seconds>()) + 
              std::string(msg) + std::string(detail::color_codes.at(L_CODE::C_RESET));
 
@@ -79,7 +82,7 @@ namespace cspace
         if (c == L_CODE::C_ERROR)
         {
             save();
-            exit(EXIT_FAILURE);
+            std::abort();
         }
     }
 
@@ -94,11 +97,14 @@ namespace cspace
 
     void logger::save()
     {
-        std::lock_guard<std::mutex> guard(log_mutex);
-        std::ofstream file(std::string(save_location) + detail::format_time<seconds>(detail::get_time<seconds>()) + std::string(".log"), 
-            std::ios_base::out);
+        if (save_location != NULL)
+        {
+            std::lock_guard<std::mutex> guard(log_mutex);
+            std::ofstream file(std::string(save_location) + detail::format_time<seconds>(detail::get_time<seconds>()) + std::string(".log"), 
+                std::ios_base::out);
 
-        file.write(logged.str().c_str(), strlen(logged.str().c_str()));
-        file.close();
+            file.write(logged.str().c_str(), strlen(logged.str().c_str()));
+            file.close();
+        }
     }
 }

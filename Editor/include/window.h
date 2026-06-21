@@ -19,6 +19,9 @@ namespace cs
         private:
             GLFWwindow* m_window;
             bool running = false;
+
+            struct Impl;
+            Impl* m_Impl;
         };
     }
 }

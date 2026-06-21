@@ -6,7 +6,8 @@ namespace cs
 {
     namespace UI
     {
-            Window::Window(int width, int height, const char* title)
+        Window::~Window() {};
+        Window::Window(int width, int height, const char* title)
         {
             if (!glfwInit())
                 cspace::logger::log("GLFW wasn't initialized properly", cspace::L_CODE::C_ERROR);
@@ -20,6 +21,8 @@ namespace cs
             }
 
             glfwMakeContextCurrent(this->m_window);
+
+            this->running = true;
         }
 
         void Window::Update()
@@ -29,6 +32,8 @@ namespace cs
             glfwSwapBuffers(this->m_window);
             
             glfwPollEvents();
+
+            this->running = !glfwWindowShouldClose(this->m_window);
         }
 
         void Window::SetShouldClose(bool value)

@@ -1,5 +1,7 @@
 #include "application.h"
+#include "logging.h"
 #include "window.h"
+#include <GLFW/glfw3.h>
 
 void Application::run()
 {
@@ -9,6 +11,8 @@ void Application::run()
     {
         win.Update();
     }
+    glfwTerminate();
+    cspace::logger::log("Closed!", cspace::L_CODE::C_INFO);
 }
 
 bool Application::running = false;
