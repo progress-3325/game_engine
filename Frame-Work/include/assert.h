@@ -3,6 +3,7 @@
 namespace cs
 {
     void assert_failed(const char*, const char*, int);
+    void assert_failed(const char*, const char*, const char*, int);
 }
 
 #define CS_ASSERT(x) do \
@@ -13,3 +14,11 @@ namespace cs
     };\
 }\
 while(false)
+
+#define CS_ASSERT_MSG(x, msg) do \
+{\
+    if (!(x))\
+    {\
+        cs::assert_failed(msg, #x, __FILE__, __LINE__);\
+    };\
+} while (false)
