@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_library(Frame-Work STATIC
-    src/logging.cpp include/core.h include/logging.h src/assert.cpp include/assert.h
+    src/logging.cpp include/core.h include/logging.h src/assert.cpp include/assert.h src/cs_time.cpp include/cs_time.h
 )
 
 
