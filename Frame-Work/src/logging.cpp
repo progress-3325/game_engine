@@ -57,6 +57,9 @@ namespace cs
 
         if (c == L_CODE::C_ERROR)
         {
+            std::string j;
+            std::cout << "Press [ENTER] to exit..." << std::endl;
+            std::cin >> j;
             save();
             std::abort();
         }
