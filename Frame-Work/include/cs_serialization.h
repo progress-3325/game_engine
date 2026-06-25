@@ -4,29 +4,50 @@
 
 namespace cs
 {
-    class Config
+    using json_t = nlohmann::json;
+
+    template<typename... Args>
+    struct value_pack;
+
+    template<>
+    struct value_pack<int, int, int, std::string>
     {
-    public:
-        Config() = default;
-        template<typename T>
-        void set(const char*, T);
-        std::string data() {return this->cfg_file.dump();}
+        int major, minor, patch;
+        std::string suffix;
+    };
 
-        Config& operator=(const Config& other);
+    using version_pack = value_pack<int, int, int, std::string>;
+
+    struct project_config
+    {
+        static void set_proj_name(const char*);
+        static void set_comp_name(const char*);
+        static void set_version(int, int, int, const char*);
+        static void set_engine_version(int, int, int, const char*);
+        static void set_start_scene(const char*);
+        static void set_exec_name(const char*);
+
+        static std::string get_proj_name();
+        static std::string get_comp_name();
+        static version_pack get_version();
+        static version_pack get_engine_version();
+        static std::string get_start_scene();
+        static std::string get_exec_name();
     private:
-        nlohmann::json cfg_file = {
-            {"ver_major", 0}, {"ver_minor", 0}, {"ver_bug", 0}, {"ver_suffix", std::string("")},
-            {"project_name", std::string("")}, {"window_name", std::string("")}, {"width", 1920}, {"height", 1080},
-            {"fullscreen", false}, {"borderless", false}
-        };
+        static json_t proj_cfg;
+        friend class serializer;
+    };
 
-        friend class Config;
+    struct game_config
+    {
+
+    private:
+        static json_t game_cfg;
         friend class serializer;
     };
 
     class serializer
     {
-        static void save(Config, const char*);
-        static Config load(const char*);
+
     };
 }
