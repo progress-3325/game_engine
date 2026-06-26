@@ -1,4 +1,4 @@
-#include "logging.h"
+#include "cs_logging.h"
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
@@ -15,6 +15,7 @@ namespace cs
     std::mutex logger::log_mutex;
     std::stringstream logger::logged;
     char* logger::save_location = NULL;
+    bool logger::new_line = true;
 
     namespace detail
     {
@@ -51,9 +52,11 @@ namespace cs
         std::string ss_msg = std::string(detail::string_codes.at(c)) + Time::get_time_str() + 
              std::string(msg) + std::string(detail::string_codes.at(L_CODE::C_RESET));
 
-        std::cout << cout_msg << std::endl;
+        std::cout << cout_msg;
+        if (new_line) std::cout << std::endl;
 
-        logged << ss_msg << "\n";
+        logged << ss_msg;
+        if (new_line) logged << '\n';
 
         if (c == L_CODE::C_ERROR)
         {

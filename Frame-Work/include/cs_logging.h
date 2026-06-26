@@ -21,8 +21,9 @@ namespace cs
     public:
         static bool debug;
         static char* save_location;
+        static bool new_line;
     private:
         static std::stringstream logged;
-        static std::mutex log_mutex;       
+        static std::mutex log_mutex;
     };
 }
