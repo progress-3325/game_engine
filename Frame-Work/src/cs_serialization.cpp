@@ -3,6 +3,7 @@
 #include <string>
 #include "cs_logging.h"
 #include "cs_assert.h"
+#include <random>
 
 namespace cs
 {
