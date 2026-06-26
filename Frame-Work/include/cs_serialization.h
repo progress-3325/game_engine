@@ -4,6 +4,8 @@
 #include <tuple>
 #include <array>
 #include <utility>
+#include "core.h"
+#include <random>
 
 namespace cs
 {
@@ -23,6 +25,21 @@ namespace cs
     };
 
     using version_pack = value_pack<int, int, int, std::string>;
+
+    template<typename T, std::size_t I>
+    struct v_array
+    {
+        T arr[I];
+    };
+
+    template<>
+    struct v_array<uint64_t, 2>
+    {
+        uint64_t high;
+        uint64_t low;
+    };
+
+    using hex_128bit = v_array<uint64_t, 2>;
 
     struct project_config
     {
@@ -88,5 +105,72 @@ namespace cs
     {
         static void save_cfg(const char*, const json_t&);
         static json_t load_cfg(const char*);
+    };
+
+
+    class UUID
+    {
+    public:
+        UUID() = default;
+        UUID(const hex_128bit& array) : m_high(array.high), m_low(array.low) {}
+        UUID(const UUID& other) : m_high(other.high()), m_low(other.low()) {}
+        UUID(const uint64_t& p_high, const uint64_t& p_low) : m_high(p_high), m_low(p_low) {}
+
+
+        uint64_t high() const { return this->m_high; }
+        uint64_t low() const { return this->m_low; }
+
+        std::string to_string() const;
+
+        UUID& operator=(const hex_128bit& array)
+        {
+            this->m_high = array.high;
+            this->m_low = array.low;
+            return *this;
+        }
+
+        UUID& operator=(const UUID& other)
+        {
+            this->m_high = other.high();
+            this->m_low = other.low();
+            return *this;
+        }
+
+        bool operator==(const UUID& other)
+        {
+            return this->m_high == other.high() && this->m_low == other.low();
+        }
+
+        bool operator!=(const UUID& other)
+        {
+            return !(*this == other);
+        }
+
+        static UUID from_string(const std::string&);
+
+    private:
+        uint64_t m_high{};
+        uint64_t m_low{};
+    };
+
+
+    class UUID_gen
+    {
+    public:
+        static UUID generate();
+
+    private:
+    };
+}
+
+namespace std
+{
+    template<>
+    struct hash<cs::UUID>
+    {
+        size_t operator()(const cs::UUID& id) const
+        {
+            return id.high() ^ id.low();
+        }
     };
 }

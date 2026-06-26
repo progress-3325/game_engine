@@ -1,4 +1,5 @@
 #include "cs_serialization.h"
+#include <sstream>
 #include <string>
 #include "cs_logging.h"
 #include "cs_assert.h"
@@ -120,7 +121,7 @@ namespace cs
     {
         for (const auto& [key, value] : proj_cfg.items())
         {
-            if (!value.is_object() && !value.is_string())
+            if (!value.is_object() && value.is_string())
             {
                 if (value.is_null()) proj_cfg.at(key) = detail::default_proj_cfg.at(key);
 
@@ -191,5 +192,57 @@ namespace cs
     value_pack<Args...> game_config::get(const char* key, const std::array<const char*, sizeof...(Args)>& keys)
     {
         return get_impl(key, keys, std::index_sequence_for<Args...>{});
+    }
+
+    void game_config::save_config(const char* path)
+    {
+        serializer::save_cfg(path, game_cfg);
+    }
+
+    void game_config::load_config(const char* path)
+    {
+        game_cfg = serializer::load_cfg(path);
+    }
+
+    void game_config::validate(const json_t& default_cfg)
+    {
+        for (const auto& [key, value] : default_cfg.items())
+        {
+            if (!default_cfg.at(key).is_object())
+            {
+                if (game_cfg.contains(key)) continue;
+                else game_cfg[key] = value;
+            }
+            else
+            {
+                for (const auto& [ar_key, ar_value] : default_cfg.at(key).items())
+                {
+                    if (game_cfg.contains(key) && game_cfg.at(key).contains(ar_key)) continue;
+                    else game_cfg[key][ar_key] = ar_value;
+                }
+            }
+        }
+    }
+
+    std::string UUID::to_string() const
+    {
+        std::stringstream ss;
+        ss << std::hex << std::setw(16) << std::setfill('0') << this->m_high << std::setw(16) << std::setfill('0') << this->m_low;
+        return ss.str();
+    }
+
+    UUID UUID::from_string(const std::string& id)
+    {
+        uint64_t high = std::stoull(id.substr(0, 16), nullptr, 16);
+        uint64_t low = std::stoull(id.substr(16, 16), nullptr, 16);
+
+        return v_array<uint64_t, 2>{high, low};
+    }
+
+    UUID UUID_gen::generate()
+    {
+        static std::random_device rd;
+        static std::mt19937 engine(rd());
+        return UUID(engine(), engine());
     }
 }
