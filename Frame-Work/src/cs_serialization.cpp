@@ -1,6 +1,7 @@
 #include "cs_serialization.h"
 #include <string>
 #include "cs_logging.h"
+#include "cs_assert.h"
 
 namespace cs
 {
@@ -137,5 +138,58 @@ namespace cs
                 }
             }
         }
+    }
+
+    template<typename T>
+    void game_config::set(const char* key, const T& value)
+    {
+        game_cfg[key] = value;
+    }
+
+    template<typename... Args, std::size_t... I>
+    void game_config::set_impl(const char* key, const value_pack<Args...>& values,
+        const std::array<const char*, sizeof...(Args)>& keys,
+        std::index_sequence<I...>
+    )
+    {
+        (
+            (game_cfg[key][keys[I]] = std::get<I>(values.values)), ...
+        );
+    }
+
+    template<typename... Args, std::size_t... I>
+    void game_config::set(const char* key, const value_pack<Args...>& values, const std::array<const char*, sizeof...(Args)>& keys)
+    {
+        set_impl(key, values, keys, std::index_sequence_for<Args...>{});
+    }
+
+
+    template<typename T>
+    T game_config::get(const char* key)
+    {
+        return game_cfg.get<T>(key);
+    }
+
+    template<typename... Args, std::size_t... I>
+    value_pack<Args...> game_config::get_impl(const char* key,
+        const std::array<const char*, sizeof...(Args)>& keys,
+        std::index_sequence<I...>
+    )
+    {
+        CS_ASSERT_MSG(game_cfg.at(key).is_object(), "If this was triggered you tried to get multiple values from a parameter that only has 1");
+        CS_ASSERT_MSG((game_cfg.at(key).contains(keys[I]) && ...), "If this is triggered you tried to get values that don't exist in this object!");
+
+        value_pack<Args...> ret_values;
+        (
+            (std::get<I>(ret_values.values) = game_cfg[key][keys[I]].template get<std::tuple_element_t<I, decltype(ret_values.values)>>()), ...
+        );
+
+        return ret_values;
+    }
+
+    template<typename... Args, std::size_t... I>
+    value_pack<Args...> game_config::get(const char* key, const std::array<const char*, sizeof...(Args)>& keys)
+    {
+        return get_impl(key, keys, std::index_sequence_for<Args...>{});
     }
 }

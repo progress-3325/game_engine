@@ -1,13 +1,19 @@
 #pragma once
 #include "vendor/nlohmann/json.hpp"
 #include <string>
+#include <tuple>
+#include <array>
+#include <utility>
 
 namespace cs
 {
     using json_t = nlohmann::json;
 
     template<typename... Args>
-    struct value_pack;
+    struct value_pack
+    {
+        std::tuple<Args...> values;
+    };
 
     template<>
     struct value_pack<int, int, int, std::string>
@@ -46,7 +52,35 @@ namespace cs
     {
         template<typename T>
         static void set(const char*, const T&);
+
+        template<typename... Args, std::size_t... I>
+        static void set(const char*, const value_pack<Args...>&, const std::array<const char*, sizeof...(Args)>&);
+
+        template<typename T>
+        static T get(const char*);
+
+        template<typename... Args, std::size_t... I>
+        static value_pack<Args...> get(const char*, const std::array<const char*, sizeof...(Args)>&);
+
+        static void save_config(const char*);
+        static void load_config(const char*);
+
+        static void validate(const json_t&);
+
     private:
+        template<typename... Args, std::size_t... I>
+        static void set_impl(const char*, const value_pack<Args...>&,
+            const std::array<const char*, sizeof...(Args)>&,
+            std::index_sequence<I...>
+        );
+
+        template<typename... Args, std::size_t... I>
+        static value_pack<Args...> get_impl(const char*,
+            const std::array<const char*, sizeof...(Args)>&,
+            std::index_sequence<I...>
+        );
+
+
         static json_t game_cfg;
     };
 
