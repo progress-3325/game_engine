@@ -24,7 +24,7 @@ namespace cs
         proj_cfg.at("Project Name") = name;
     }
 
-    void project_config::set_version(int major, int minor, int patch, const char* suffix)
+    void project_config::set_version(const int& major, const int& minor, const int& patch, const char* suffix)
     {
         proj_cfg.at("Version").at("Major") = major;
         proj_cfg.at("Version").at("Minor") = minor;
@@ -32,7 +32,7 @@ namespace cs
         proj_cfg.at("Version").at("Suffix") = suffix;
     }
 
-    void project_config::set_engine_version(int major, int minor, int patch, const char* suffix)
+    void project_config::set_engine_version(const int& major, const int& minor, const int& patch, const char* suffix)
     {
         proj_cfg.at("Engine").at("Major") = major;
         proj_cfg.at("Engine").at("Minor") = minor;

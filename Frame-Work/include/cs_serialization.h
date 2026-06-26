@@ -22,8 +22,8 @@ namespace cs
     {
         static void set_proj_name(const char*);
         static void set_comp_name(const char*);
-        static void set_version(int, int, int, const char*);
-        static void set_engine_version(int, int, int, const char*);
+        static void set_version(const int&, const int&, const int&, const char*);
+        static void set_engine_version(const int&, const int&, const int&, const char*);
         static void set_start_scene(const char*);
         static void set_exec_name(const char*);
 
@@ -44,10 +44,10 @@ namespace cs
 
     struct game_config
     {
-
+        template<typename T>
+        static void set(const char*, const T&);
     private:
         static json_t game_cfg;
-        friend class serializer;
     };
 
     struct serializer
