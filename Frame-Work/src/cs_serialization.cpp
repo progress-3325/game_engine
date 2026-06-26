@@ -1,12 +1,16 @@
 #include "cs_serialization.h"
 #include <string>
+#include "cs_logging.h"
 
 namespace cs
 {
     json_t project_config::proj_cfg = {
         {"Project Name", ""}, {"Company Name", ""},
-        {"Version", {"Major", 0}, {"Minor", 0}, {"Patch", 0}, {"Suffix", std::string("")}}, 
-        {"Engine version", {"Major", 0}, {"Minor", 0}, {"Patch", 0}, {"Suffix"}, std::string("")},
+        {"Version", {
+            {"Major", 0}, {"Minor", 0}, 
+            {"Patch", 0}, {"Suffix", std::string("")}
+            }}, 
+        {"Engine version", {{"Major", 0}, {"Minor", 0}, {"Patch", 0}, {"Suffix"}, std::string("")}},
         {"Start Scene", std::string("")}, {"Exec Name", std::string("")}
     };
 
@@ -87,5 +91,51 @@ namespace cs
     {
         if (proj_cfg.at("Exec Name") == std::string("")) return "Game";
         return proj_cfg.at("Exec Name");
+    }
+
+    void project_config::save_config(const char *path)
+    {
+        serializer::save_cfg(path, proj_cfg);
+    }
+
+    void project_config::load_config(const char *path)
+    {
+        proj_cfg = serializer::load_cfg(path);
+
+        validate();
+    }
+
+    namespace detail
+    {
+        const json_t default_proj_cfg = {
+            {"Project Name", "Project"}, {"Company Name", "Company"},
+            {"Version", {{"Major", 0}, {"Minor", 0}, {"Patch", 0}, {"Suffix", std::string("not indev")}}}, 
+            {"Engine version", {{"Major", 0}, {"Minor", 0}, {"Patch", 0}, {"Suffix", std::string("indev")}}},
+            {"Start Scene", std::string("")}, {"Exec Name", std::string("")}
+        };
+    }
+
+    void project_config::validate()
+    {
+        for (const auto& [key, value] : proj_cfg.items())
+        {
+            if (!value.is_object() && !value.is_string())
+            {
+                if (value.is_null()) proj_cfg.at(key) = detail::default_proj_cfg.at(key);
+
+                std::string s_value = std::string(key) + std::string(": ") + std::string(value.dump());
+                logger::log(s_value.c_str(), L_CODE::C_DEBUG);
+            }
+            else if (value.is_string())
+            {
+                for (const auto& [ar_key, ar_value] : value.items())
+                {
+                    if (ar_value.is_null() || (!ar_value.is_string() && ar_key != "Suffix")) proj_cfg.at(key).at(ar_key) = detail::default_proj_cfg.at(key).at(ar_key);
+                    
+                    std::string s_value = std::string(ar_key) + std::string(": ") + std::string(ar_value.dump());
+                    logger::log(s_value.c_str(), L_CODE::C_DEBUG);
+                }
+            }
+        }
     }
 }

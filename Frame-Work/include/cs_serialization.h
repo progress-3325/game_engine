@@ -33,9 +33,13 @@ namespace cs
         static version_pack get_engine_version();
         static std::string get_start_scene();
         static std::string get_exec_name();
+
+        static void save_config(const char*);
+        static void load_config(const char*);
+
+        static void validate();
     private:
         static json_t proj_cfg;
-        friend class serializer;
     };
 
     struct game_config
@@ -46,8 +50,9 @@ namespace cs
         friend class serializer;
     };
 
-    class serializer
+    struct serializer
     {
-
+        static void save_cfg(const char*, const json_t&);
+        static json_t load_cfg(const char*);
     };
 }
