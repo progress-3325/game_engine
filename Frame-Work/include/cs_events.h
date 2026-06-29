@@ -32,7 +32,7 @@ namespace cs
 
         enum class InputEventType: uint32_t
         {
-
+            KeyPressed = 0
         };
         
         enum class SceneEventType : uint32_t
@@ -59,8 +59,28 @@ namespace cs
     class EventDispatcher
     {
     public:
-        static void dispatch(const EventType&);
+        static void dispatch(Event*);
     private:
         static Mutex m_lock;
+    };
+
+    class Event
+    {
+    public:
+        virtual ~Event() = 0;
+
+        virtual EventType type()   const = 0;
+        virtual const char* name() const = 0;
+        virtual void dispatch()          = 0;
+    };
+
+    class KeyPressedEvent : public Event
+    {
+    public:
+        EventType type() const override { return EventType(static_cast<uint16_t>(EventType::EventCategories::Input), 
+            static_cast<uint32_t>(EventType::InputEventType::KeyPressed)); }
+        const char* name() const override { return "KeyPressedEvent"; }
+
+        const char key{0};
     };
 }
