@@ -1,6 +1,7 @@
 #pragma once
 #include "core.h"
 #include "cs_threading.h"
+#include "cs_time.h"
 
 namespace cs
 {
@@ -27,22 +28,34 @@ namespace cs
 
         enum class ApplicationEventType : uint32_t
         {
+            ApplicationCloseEvent = 0, ApplicationPauseEvent, 
+            ApplicationResumeEvent, AudioFinishedEvent,
 
+            NetworkClientConnectedEvent, NetworkClientDisconnectedEvent
         };
 
         enum class InputEventType: uint32_t
         {
-            KeyPressed = 0
+            KeyPressedEvent = 0, KeyHoldEvent, KeyReleasedEvent, 
+            
+            MouseButtonPressedEvent, MouseButtonHoldEvent,
+            MouseButtonReleasedEvent, MouseMovedEvent,
+            MouseScrollEvent, 
+            
+            GamepadConnectedEvent, GamepadDisconnectedEvent,
+            GamepadButtonPressedEvent, GamepadButtonHoldEvent, 
+            GamepadButtonReleasedEvent, GamepadAxisChangedEvent
         };
         
         enum class SceneEventType : uint32_t
         {
-
+            SceneLoadedEvent, SceneSavedEvent
         };
 
         enum class AssetEventType : uint32_t
         {
-
+            AssetLoadedEvent, AssetUnloadedEvent,
+            AssetReloadedEvent
         };
 
         enum class PhysicsEventType : uint32_t
@@ -74,11 +87,34 @@ namespace cs
         virtual void dispatch()          = 0;
     };
 
+    class ApplicationCloseEvent : public Event
+    {
+    public:
+        ApplicationCloseEvent() { time.start(); }
+        EventType type() const override { 
+            return EventType(static_cast<uint16_t>(EventType::EventCategories::Application),
+            static_cast<uint32_t>(EventType::ApplicationEventType::ApplicationCloseEvent));}
+        
+        const char* name() const override { return "ApplicationCloseEvent"; }
+
+        Time::stopwatch time;
+    };
+
+    class ApplicationPauseEvent : public ApplicationCloseEvent
+    {
+    public:
+        EventType type() const override { 
+            return EventType(static_cast<uint16_t>(EventType::EventCategories::Application),
+            static_cast<uint32_t>(EventType::ApplicationEventType::ApplicationPauseEvent));}
+        
+        const char* name() const override { return "ApplicationPauseEvent"; }
+    };
+
     class KeyPressedEvent : public Event
     {
     public:
         EventType type() const override { return EventType(static_cast<uint16_t>(EventType::EventCategories::Input), 
-            static_cast<uint32_t>(EventType::InputEventType::KeyPressed)); }
+            static_cast<uint32_t>(EventType::InputEventType::KeyPressedEvent)); }
         const char* name() const override { return "KeyPressedEvent"; }
 
         const char key{0};
