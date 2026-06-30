@@ -2,6 +2,7 @@
 #include "core.h"
 #include "cs_threading.h"
 #include "cs_time.h"
+#include <string>
 
 namespace cs
 {
@@ -91,11 +92,11 @@ namespace cs
     {
     public:
         ApplicationCloseEvent() { time.start(); }
-        EventType type() const override { 
+        virtual EventType type() const override { 
             return EventType(static_cast<uint16_t>(EventType::EventCategories::Application),
             static_cast<uint32_t>(EventType::ApplicationEventType::ApplicationCloseEvent));}
         
-        const char* name() const override { return "ApplicationCloseEvent"; }
+        virtual const char* name() const override { return "ApplicationCloseEvent"; }
 
         Time::stopwatch time;
     };
@@ -110,13 +111,162 @@ namespace cs
         const char* name() const override { return "ApplicationPauseEvent"; }
     };
 
+    class ApplicationResumeEvent : public Event
+    {
+    public:
+        ApplicationResumeEvent() = default;
+
+        EventType type() const override
+        {
+            return EventType(static_cast<uint16_t>(EventType::EventCategories::Application), 
+            static_cast<uint32_t>(EventType::ApplicationEventType::ApplicationResumeEvent));
+        }
+    };
+
     class KeyPressedEvent : public Event
     {
     public:
-        EventType type() const override { return EventType(static_cast<uint16_t>(EventType::EventCategories::Input), 
+        virtual EventType type() const override { return EventType(static_cast<uint16_t>(EventType::EventCategories::Input), 
             static_cast<uint32_t>(EventType::InputEventType::KeyPressedEvent)); }
-        const char* name() const override { return "KeyPressedEvent"; }
+        virtual const char* name() const override { return "KeyPressedEvent"; }
 
         const char key{0};
     };
+
+    class KeyHoldEvent : public KeyPressedEvent
+    {
+    public:
+        EventType type() const override { return EventType(static_cast<uint16_t>(EventType::EventCategories::Input), 
+            static_cast<uint32_t>(EventType::InputEventType::KeyHoldEvent)); }
+        const char* name() const override { return "KeyHoldEvent"; }
+    };
+
+    class KeyReleasedEvent : public KeyPressedEvent
+    {
+    public:
+        EventType type() const override { return EventType(static_cast<uint16_t>(EventType::EventCategories::Input), 
+            static_cast<uint32_t>(EventType::InputEventType::KeyReleasedEvent)); }
+        const char* name() const override { return "KeyReleasedEvent"; }
+    };
+
+    class MouseButtonPressedEvent : public Event
+    {
+    public:
+        virtual EventType type() const override
+        {
+            return EventType(static_cast<uint16_t>(EventType::EventCategories::Input),
+            static_cast<uint32_t>(EventType::InputEventType::MouseButtonPressedEvent));
+        }
+
+        virtual const char* name() const override { return "MouseButtonPressedEvent"; }
+        uint16_t key{0};
+    };
+
+    class MouseButtonHoldEvent : public MouseButtonPressedEvent
+    {
+    public:
+        EventType type() const override
+        {
+            return EventType(static_cast<uint16_t>(EventType::EventCategories::Input),
+            static_cast<uint32_t>(EventType::InputEventType::MouseButtonHoldEvent));
+        }
+
+        const char* name() const override { return "MouseButtonHoldEvent"; }
+    };
+
+    class MouseButtonReleasedEvent : public MouseButtonPressedEvent
+    {
+    public:
+        virtual EventType type() const override
+        {
+            return EventType(static_cast<uint16_t>(EventType::EventCategories::Input),
+            static_cast<uint32_t>(EventType::InputEventType::MouseButtonReleasedEvent));
+        }
+
+        virtual const char* name() const override { return "MouseButtonReleasedEvent"; }
+    };
+
+    class MouseMovedEvent : public Event
+    {
+    public:
+        EventType type() const override
+        {
+            return EventType(static_cast<uint16_t>(EventType::EventCategories::Input),
+            static_cast<uint32_t>(EventType::InputEventType::MouseMovedEvent));
+        }
+
+        const char* name() const override { return "MouseMovedEvent"; }
+
+        f32_t X_axis{0.0f}, Y_axis{0.0f};
+    };
+
+    class MouseScrollEvent : public Event
+    {
+    public:
+        EventType type() const override
+        {
+            return EventType(static_cast<uint16_t>(EventType::EventCategories::Input),
+            static_cast<uint32_t>(EventType::InputEventType::MouseScrollEvent));
+        }
+        
+        const char* name() const override { return "MouseScrollEvent"; }
+
+        f32_t position{0.0f};
+    };
+
+    class GamepadConnectedEvent : public Event
+    {
+    public:
+        virtual EventType type() const override
+        {
+            return EventType(static_cast<uint16_t>(EventType::EventCategories::Input),
+            static_cast<uint32_t>(EventType::InputEventType::GamepadConnectedEvent));
+        }
+
+        virtual const char* name() const override { return "GamepadConnectedEvent"; }
+
+        std::string profile_name;
+    };
+
+    class GamepadDisconnectedEvent : public GamepadConnectedEvent
+    {
+    public:
+        EventType type() const override
+        {
+            return EventType(static_cast<uint16_t>(EventType::EventCategories::Input),
+            static_cast<uint32_t>(EventType::InputEventType::GamepadDisconnectedEvent));
+        }
+
+        const char* name() const override { return "GamepadDisconnectedEvent"; }
+
+        std::string reason;
+    };
+
+    class GamepadButtonPressedEvent : public Event
+    {
+    public:
+        virtual EventType type() const override
+        {
+            return EventType(static_cast<uint16_t>(EventType::EventCategories::Input),
+            static_cast<uint32_t>(EventType::InputEventType::GamepadButtonPressedEvent));
+        }
+
+        virtual const char* name() const override { return "GamepadButtonPressedEvent"; }
+
+        uint16_t button{0};
+    };
+
+    class GamepadButtonHoldEvent : public GamepadButtonPressedEvent
+    {
+    public:
+        EventType type() const override
+        {
+            return EventType(static_cast<uint16_t>(EventType::EventCategories::Input),
+            static_cast<uint32_t>(EventType::InputEventType::GamepadButtonHoldEvent));
+        }
+
+        const char* name() const override { return "GamepadButtonHoldEvent"; }
+    };
+
+    
 }
