@@ -91,14 +91,11 @@ namespace cs
     class ApplicationCloseEvent : public Event
     {
     public:
-        ApplicationCloseEvent() { time.start(); }
         virtual EventType type() const override { 
             return EventType(static_cast<uint16_t>(EventType::EventCategories::Application),
             static_cast<uint32_t>(EventType::ApplicationEventType::ApplicationCloseEvent));}
         
         virtual const char* name() const override { return "ApplicationCloseEvent"; }
-
-        Time::stopwatch time;
     };
 
     class ApplicationPauseEvent : public ApplicationCloseEvent
@@ -295,5 +292,52 @@ namespace cs
               R_X_axis{0.0f}, R_Y_axis{0.0f};
     };
 
-    
+    class SceneLoadedEvent : public Event
+    {
+    public:
+        virtual EventType type() const override
+        {
+            return EventType(static_cast<uint16_t>(EventType::EventCategories::Scene),
+            static_cast<uint32_t>(EventType::SceneEventType::SceneLoadedEvent));
+        }
+
+        virtual const char* name() const override { return "SceneLoadedEvent"; }
+
+
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    namespace App
+    {
+        class Closed
+        {
+        public:
+            Closed(std::unique_ptr<ApplicationCloseEvent> ev)
+            {
+                closed = true;
+                closed_time = std::chrono::steady_clock::now();
+            }
+
+            std::string closed_time_str() const { return Time::get_time_str(closed_time); }
+            
+        private:
+            bool closed{false};
+            Time::TimePoint closed_time;
+        };
+    }
 }
