@@ -47,4 +47,19 @@ namespace cs
     {
         return 1.0f / Time::deltaTime();
     }
+
+    std::string Time::get_time_str(TimePoint tp)
+    {
+        auto midnight = std::chrono::floor<std::chrono::days>(tp);
+
+        std::chrono::hh_mm_ss<std::chrono::seconds> tod{std::chrono::duration_cast<std::chrono::seconds>(tp - midnight)};
+
+        std::string colon = ":";
+
+        std::string ret = std::string("[") + std::to_string(tod.hours().count()) + colon +
+            std::to_string(tod.minutes().count()) + colon + std::to_string(tod.seconds().count()) +
+            std::string("]");
+
+        return ret;
+    }
 }

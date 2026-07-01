@@ -7,9 +7,11 @@ namespace cs
     class Time
     {
     public:
+        using TimePoint = std::chrono::steady_clock::time_point;
         static inline float deltaTime() {return delta_time;}
         static inline double totalTime() {return total_time;}
-        static std::string get_time_str();    
+        static std::string get_time_str();
+        static std::string get_time_str(TimePoint tp);
     private:
         static float delta_time;
         static double total_time;
@@ -20,7 +22,7 @@ namespace cs
             static void update();
             static double FPS();
         private:
-            static std::chrono::steady_clock::time_point m_last_frame;
+            static TimePoint m_last_frame;
         };
 
         class stopwatch
@@ -31,8 +33,10 @@ namespace cs
             double readMilliseconds();
         
         private:
-            std::chrono::steady_clock::time_point tmp_start;
-            std::chrono::steady_clock::time_point tmp_end;
+            TimePoint tmp_start;
+            TimePoint tmp_end;
         };
+
+
     };
 }
