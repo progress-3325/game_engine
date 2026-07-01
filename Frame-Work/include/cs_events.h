@@ -268,5 +268,32 @@ namespace cs
         const char* name() const override { return "GamepadButtonHoldEvent"; }
     };
 
+    class GamepadButtonReleasedEvent : public GamepadButtonPressedEvent
+    {
+    public:
+        EventType type() const override
+        {
+            return EventType(static_cast<uint16_t>(EventType::EventCategories::Input),
+            static_cast<uint32_t>(EventType::InputEventType::GamepadButtonReleasedEvent));
+        }
+
+        const char* name() const override { return "GamepadButtonReleasedEvent"; }
+    };
+
+    class GamepadAxisChangedEvent : Event
+    {
+    public:
+        EventType type() const override
+        {
+            return EventType(static_cast<uint16_t>(EventType::EventCategories::Input),
+            static_cast<uint32_t>(EventType::InputEventType::GamepadAxisChangedEvent));
+        }
+
+        const char* name() const override { return "GamepadAxisChangedEvent"; }
+
+        f32_t L_X_axis{0.0f}, L_Y_axis{0.0f},
+              R_X_axis{0.0f}, R_Y_axis{0.0f};
+    };
+
     
 }
