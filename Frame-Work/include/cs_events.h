@@ -85,7 +85,7 @@ namespace cs
 
         virtual EventType type()   const = 0;
         virtual const char* name() const = 0;
-        virtual void dispatch()          = 0;
+        void dispatch();
     };
 
     class ApplicationCloseEvent : public Event
@@ -280,7 +280,7 @@ namespace cs
         const char* name() const override { return "GamepadButtonReleasedEvent"; }
     };
 
-    class GamepadAxisChangedEvent : Event
+    class GamepadAxisChangedEvent : public Event
     {
     public:
         EventType type() const override
