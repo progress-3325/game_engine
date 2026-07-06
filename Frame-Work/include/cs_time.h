@@ -35,6 +35,7 @@ namespace cs
         private:
             TimePoint tmp_start;
             TimePoint tmp_end;
+            bool running{false};
         };
 
 

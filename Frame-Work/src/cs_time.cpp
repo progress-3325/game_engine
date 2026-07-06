@@ -15,6 +15,7 @@ namespace cs
 
     void Time::stopwatch::start()
     {
+        this->running = true;
         this->tmp_start = std::chrono::steady_clock::now();
     }
 
@@ -25,9 +26,11 @@ namespace cs
 
     double Time::stopwatch::readMilliseconds()
     {
-        return std::chrono::duration<double>(this->tmp_end - this->tmp_start).count();
+        if (!running) return std::chrono::duration<double>(this->tmp_end - this->tmp_start).count();
+        const auto now = std::chrono::steady_clock::now();
+        return std::chrono::duration<double>(now - this->tmp_start).count();
     }
-
+    
     std::string Time::get_time_str()
     {
         auto now = std::chrono::system_clock::now();
