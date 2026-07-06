@@ -69,11 +69,11 @@ namespace cs
 
         };
     };
-
     class EventDispatcher
     {
     public:
         static void dispatch(Event*);
+        static void process();
     private:
         static Mutex m_lock;
     };
@@ -127,7 +127,12 @@ namespace cs
             static_cast<uint32_t>(EventType::InputEventType::KeyPressedEvent)); }
         virtual const char* name() const override { return "KeyPressedEvent"; }
 
-        const char key{0};
+        Input::Keys key{0};
+
+        KeyPressedEvent& operator=(const KeyPressedEvent& other)
+        {
+            this->key = other.key;
+        }
     };
 
     class KeyHoldEvent : public KeyPressedEvent
@@ -334,10 +339,33 @@ namespace cs
             }
 
             std::string closed_time_str() const { return Time::get_time_str(closed_time); }
-            
+
         private:
             bool closed{false};
             Time::TimePoint closed_time;
         };
+    }
+
+    namespace Input
+    {
+        enum class Keys : uint16_t
+        {
+            Key0 = 0, Key1, Key2, Key3, Key4,
+            Key5, Key6, Key7, Key8, Key9,
+            
+            KeyQ, KeyW, KeyE, KeyR, KeyT,
+            KeyY, KeyU, KeyI, KeyO, KeyP,
+            KeyA, KeyS, KeyD, KeyF, KeyG,
+            KeyH, KeyJ, KeyK, KeyL, KeyZ,
+            KeyX, KeyC, KeyV, KeyB, KeyN,
+            KeyM
+        };
+
+        template<Keys key>
+        bool isKeyPressed();
+        template<Keys key>
+        bool isKeyHeld();
+        template<Keys key>
+        bool isKeyReleased();
     }
 }
