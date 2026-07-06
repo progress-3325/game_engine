@@ -364,5 +364,7 @@ namespace cs
         bool isKeyHeld();
         template<Keys key>
         bool isKeyReleased();
+        template<Keys key>
+        double keyHeldTime();
     }
 }

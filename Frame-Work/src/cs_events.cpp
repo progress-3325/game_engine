@@ -4,6 +4,7 @@
 #include <memory>
 #include <unordered_map>
 #include <array>
+#include "cs_time.h"
 
 #define statcast_uint16(val) static_cast<uint16_t>(val)
 #define statcast_uint32(val) static_cast<uint32_t>(val)
@@ -59,6 +60,7 @@ namespace cs
             static std::array<bool, 36> is_pressed;
             static std::array<bool, 36> is_held;
             static std::array<bool, 36> is_released;
+            static std::array<Time::stopwatch, 36> heldTime;
         };
 
     }
@@ -82,7 +84,22 @@ namespace cs
         return detail::key_pressed::is_released[static_cast<size_t>(key)];
     }
 
+    template<Input::Keys key>
+    double Input::keyHeldTime()
+    {
+        return detail::key_pressed::heldTime[statcast_uint16(key)].readMilliseconds();
+    }
 
+
+    void KeyPressedEvent::execute() const
+    {
+        const auto index = statcast_uint16(this->key);
+
+        detail::key_pressed::is_pressed[index] = true;
+        detail::key_pressed::is_held[index] = true;
+        detail::key_pressed::is_released[index] = false;
+        detail::key_pressed::heldTime[index].start();
+    }
 
 
     void EventDispatcher::process()
