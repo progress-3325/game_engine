@@ -37,7 +37,7 @@ namespace cs
 
         enum class InputEventType: uint32_t
         {
-            KeyPressedEvent = 0, KeyHoldEvent, KeyReleasedEvent, 
+            KeyPressedEvent = 0, KeyReleasedEvent, 
             
             MouseButtonPressedEvent, MouseButtonHoldEvent,
             MouseButtonReleasedEvent, MouseMovedEvent,
@@ -86,6 +86,7 @@ namespace cs
         virtual EventType type()   const = 0;
         virtual const char* name() const = 0;
         void dispatch();
+        virtual void execute()     const = 0;
     };
 
     class ApplicationCloseEvent : public Event
@@ -96,6 +97,8 @@ namespace cs
             static_cast<uint32_t>(EventType::ApplicationEventType::ApplicationCloseEvent));}
         
         virtual const char* name() const override { return "ApplicationCloseEvent"; }
+
+        virtual void execute() const override;
     };
 
     class ApplicationPauseEvent : public ApplicationCloseEvent
@@ -133,14 +136,8 @@ namespace cs
         {
             this->key = other.key;
         }
-    };
 
-    class KeyHoldEvent : public KeyPressedEvent
-    {
-    public:
-        EventType type() const override { return EventType(static_cast<uint16_t>(EventType::EventCategories::Input), 
-            static_cast<uint32_t>(EventType::InputEventType::KeyHoldEvent)); }
-        const char* name() const override { return "KeyHoldEvent"; }
+        virtual void execute() const override;
     };
 
     class KeyReleasedEvent : public KeyPressedEvent

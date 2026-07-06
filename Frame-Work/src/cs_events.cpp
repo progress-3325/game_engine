@@ -5,6 +5,10 @@
 #include <unordered_map>
 #include <array>
 
+#define statcast_uint16(val) static_cast<uint16_t>(val)
+#define statcast_uint32(val) static_cast<uint32_t>(val)
+#define stcst_enum(val) statcast_uint32(val)
+
 namespace cs
 {
     Event::~Event() = default;
@@ -12,7 +16,7 @@ namespace cs
     {
         struct ev_storer
         {
-            static std::deque<std::shared_ptr<Event>> events;
+            static std::deque<std::unique_ptr<Event>> events;
         };
     }
 
@@ -28,17 +32,17 @@ namespace cs
 
     void Event::dispatch()
     {
-        EventDispatcher::dispatch(std::move(this));
+        EventDispatcher::dispatch(this);
     }
 
     void EventDispatcher::process()
     {
         Guard lock(m_lock);
         
-        for (const std::shared_ptr<Event>& event : detail::ev_storer::events)
+        for (const std::unique_ptr<Event>& event : detail::ev_storer::events)
         {
             EventType ev_type(event->type());
-            if (ev_type.category == static_cast<uint16_t>(EventType::EventCategories::Application))
+            if (ev_type.category == statcast_uint16(EventType::EventCategories::Application))
             {
                 if (ev_type.type == static_cast<uint32_t>(EventType::ApplicationEventType::ApplicationCloseEvent))
                 {
@@ -54,6 +58,7 @@ namespace cs
         {
             static std::array<bool, 36> is_pressed;
             static std::array<bool, 36> is_held;
+            static std::array<bool, 36> is_released;
         };
 
     }
@@ -74,55 +79,72 @@ namespace cs
     template<Input::Keys key>
     bool Input::isKeyReleased()
     {
-        return !(Input::isKeyPressed<key>());
+        return detail::key_pressed::is_released[static_cast<size_t>(key)];
     }
 
 
 
 
-
-
-
-
-    template<Input::Keys key>
-    uint32_t key_held_count{0};
-
     void EventDispatcher::process()
     {
         using namespace detail;
 
-        uint64_t i;
-        while (i < 36)
-        {
-            key_pressed::is_pressed[i] = false;
-            key_pressed::is_held[i++] = false;
-        }
+        key_pressed::is_pressed.fill(false);
+        key_pressed::is_released.fill(false);
 
         while (!ev_storer::events.empty())
         {
             auto& event = ev_storer::events.front();
-            EventType type = event->type();
+            ev_storer::events.pop_front();
+            event->execute();
 
+            /*EventType type = event->type();
             switch (type.category)
             {
-                case 0:
+                case stcst_enum(EventType::EventCategories::Application):
                 {
                     switch (type.type)
                     {
 
                     }
+                    break;
                 }
-                case 1:
+                case stcst_enum(EventType::EventCategories::Input): // Input event type
                 {
                     switch (type.type)
                     {
-                        case 1:
+                        case 1: // Key pressed event type
                         {
-                            
+                            auto* key_pressed_event = static_cast<KeyPressedEvent*>(event.get());
+
+                            if (key_pressed_event)
+                            {
+                                Input::Keys pressed_key = key_pressed_event->key;
+                                const auto index = statcast_uint16(pressed_key);
+                                key_pressed::is_pressed[index] = true;
+                                key_pressed::is_held[index] = true;
+                                key_pressed::is_released[index] = false;
+                            }
+                            break;
                         }
 
-                        default: continue;
+                        case 2: // Key released event type
+                        {
+                            auto* key_released_event = static_cast<KeyReleasedEvent*>(event.get());
+
+                            if (key_released_event)
+                            {
+                                Input::Keys released_key = key_released_event->key;
+                                const auto index = statcast_uint16(released_key);
+                                key_pressed::is_held[index] = false;
+                                key_pressed::is_released[index] = true;
+                            }
+                            break;
+                        }
+
+                        default: break;
                     }
+                    break;
                 }
                 case 2:
                 {
@@ -130,6 +152,7 @@ namespace cs
                     {
                         
                     }
+                    break;
                 }
                 case 3:
                 {
@@ -137,6 +160,7 @@ namespace cs
                     {
                         
                     }
+                    break;
                 }
                 case 4:
                 {
@@ -144,12 +168,12 @@ namespace cs
                     {
                         
                     }
+                    break;
                 }
                 case 5: continue;
                     
                 default: continue;
-            }
-            ev_storer::events.pop_front();
+            } */
         }
     }
 }
