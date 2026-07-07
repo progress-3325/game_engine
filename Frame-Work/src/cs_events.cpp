@@ -9,6 +9,7 @@
 #define statcast_uint16(val) static_cast<uint16_t>(val)
 #define statcast_uint32(val) static_cast<uint32_t>(val)
 #define stcst_enum(val) statcast_uint32(val)
+static constexpr size_t key_amount = 42;
 
 namespace cs
 {
@@ -57,10 +58,10 @@ namespace cs
     {
         struct key_pressed
         {
-            static std::array<bool, 36> is_pressed;
-            static std::array<bool, 36> is_held;
-            static std::array<bool, 36> is_released;
-            static std::array<Time::stopwatch, 36> heldTime;
+            static std::array<bool, key_amount> is_pressed;
+            static std::array<bool, key_amount> is_held;
+            static std::array<bool, key_amount> is_released;
+            static std::array<Time::stopwatch, key_amount> heldTime;
         };
 
     }
@@ -97,8 +98,34 @@ namespace cs
 
         detail::key_pressed::is_pressed[index] = true;
         detail::key_pressed::is_held[index] = true;
-        detail::key_pressed::is_released[index] = false;
         detail::key_pressed::heldTime[index].start();
+    }
+
+    void KeyReleasedEvent::execute() const
+    {
+        const auto index = statcast_uint16(this->key);
+
+        detail::key_pressed::is_held[index] = false;
+        detail::key_pressed::heldTime[index].stop();
+        detail::key_pressed::is_released[index] = true;
+    }
+
+    void MouseButtonPressedEvent::execute() const
+    {
+        const auto index = statcast_uint16(this->key);
+
+        detail::key_pressed::is_pressed[index] = true;
+        detail::key_pressed::is_held[index] = true;
+        detail::key_pressed::heldTime[index].start();
+    }
+
+    void MouseButtonReleasedEvent::execute() const
+    {
+        const auto index = statcast_uint16(this->key);
+
+        detail::key_pressed::is_held[index] = false;
+        detail::key_pressed::is_released[index] = true;
+        detail::key_pressed::heldTime[index].stop();
     }
 
 
@@ -114,83 +141,6 @@ namespace cs
             auto& event = ev_storer::events.front();
             ev_storer::events.pop_front();
             event->execute();
-
-            /*EventType type = event->type();
-            switch (type.category)
-            {
-                case stcst_enum(EventType::EventCategories::Application):
-                {
-                    switch (type.type)
-                    {
-
-                    }
-                    break;
-                }
-                case stcst_enum(EventType::EventCategories::Input): // Input event type
-                {
-                    switch (type.type)
-                    {
-                        case 1: // Key pressed event type
-                        {
-                            auto* key_pressed_event = static_cast<KeyPressedEvent*>(event.get());
-
-                            if (key_pressed_event)
-                            {
-                                Input::Keys pressed_key = key_pressed_event->key;
-                                const auto index = statcast_uint16(pressed_key);
-                                key_pressed::is_pressed[index] = true;
-                                key_pressed::is_held[index] = true;
-                                key_pressed::is_released[index] = false;
-                            }
-                            break;
-                        }
-
-                        case 2: // Key released event type
-                        {
-                            auto* key_released_event = static_cast<KeyReleasedEvent*>(event.get());
-
-                            if (key_released_event)
-                            {
-                                Input::Keys released_key = key_released_event->key;
-                                const auto index = statcast_uint16(released_key);
-                                key_pressed::is_held[index] = false;
-                                key_pressed::is_released[index] = true;
-                            }
-                            break;
-                        }
-
-                        default: break;
-                    }
-                    break;
-                }
-                case 2:
-                {
-                    switch (type.type)
-                    {
-                        
-                    }
-                    break;
-                }
-                case 3:
-                {
-                    switch (type.type)
-                    {
-                        
-                    }
-                    break;
-                }
-                case 4:
-                {
-                    switch (type.type)
-                    {
-                        
-                    }
-                    break;
-                }
-                case 5: continue;
-                    
-                default: continue;
-            } */
         }
     }
 }
