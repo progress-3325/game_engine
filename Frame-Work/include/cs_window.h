@@ -18,6 +18,9 @@ namespace cs
             glfwSetWindowUserPointer(this->window, this);
         }
 
+        void pollEvents() const { glfwPollEvents(); }
+        void swapBuffers() const { glfwSwapBuffers(this->window); }
+
         operator GLFWwindow*()
         {
             return this->window;
