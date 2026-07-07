@@ -9,12 +9,14 @@ namespace cs
         {
             case GLFW_PRESS:
             {
-                (new KeyPressedEvent(static_cast<Input::Keys>(key)))->dispatch();
+                KeyPressedEvent event{static_cast<Input::Keys>(key)};
+                event.dispatch();
                 break;
             }
             case GLFW_RELEASE:
             {
-                (new KeyReleasedEvent(static_cast<Input::Keys>(key)))->dispatch();
+                KeyReleasedEvent event{static_cast<Input::Keys>(key)};
+                event.dispatch();
                 break;
             }
             default: break;
