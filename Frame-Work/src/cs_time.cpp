@@ -22,6 +22,7 @@ namespace cs
     void Time::stopwatch::stop()
     {
         this->tmp_end = std::chrono::steady_clock::now();
+        this->running = false;
     }
 
     double Time::stopwatch::readMilliseconds()
