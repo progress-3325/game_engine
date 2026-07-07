@@ -16,6 +16,7 @@ namespace cs
 
             glfwMakeContextCurrent(this->window);
             glfwSetWindowUserPointer(this->window, this);
+            glfwSetKeyCallback(this->window, key_callback);
         }
 
         void pollEvents() const { glfwPollEvents(); }
