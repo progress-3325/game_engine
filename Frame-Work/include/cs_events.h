@@ -3,6 +3,7 @@
 #include "cs_threading.h"
 #include "cs_time.h"
 #include <string>
+#include <GLFW/glfw3.h>
 
 namespace cs
 {
@@ -126,6 +127,9 @@ namespace cs
     class KeyPressedEvent : public Event
     {
     public:
+        KeyPressedEvent() = default;
+        KeyPressedEvent(const Input::Keys& p_key) : key(p_key) {}
+
         virtual EventType type() const override { return EventType(static_cast<uint16_t>(EventType::EventCategories::Input), 
             static_cast<uint32_t>(EventType::InputEventType::KeyPressedEvent)); }
         virtual const char* name() const override { return "KeyPressedEvent"; }
@@ -143,9 +147,12 @@ namespace cs
     class KeyReleasedEvent : public KeyPressedEvent
     {
     public:
+        KeyReleasedEvent(const Input::Keys& p_key) : key(p_key) {}
         EventType type() const override { return EventType(static_cast<uint16_t>(EventType::EventCategories::Input), 
             static_cast<uint32_t>(EventType::InputEventType::KeyReleasedEvent)); }
         const char* name() const override { return "KeyReleasedEvent"; }
+        
+        Input::Keys key{0};
 
         void execute() const override;
     };
@@ -341,15 +348,21 @@ namespace cs
     {
         enum class Keys : uint16_t
         {
-            Key0 = 0, Key1, Key2, Key3, Key4,
+            KeySpace = GLFW_KEY_SPACE, KeyApostrophe = GLFW_KEY_APOSTROPHE,
+            KeyComma = GLFW_KEY_COMMA, KeyDash, KeyPeriod, KeySlash,
+
+
+            Key0, Key1, Key2, Key3, Key4,
             Key5, Key6, Key7, Key8, Key9,
+
+            KeySemicolon = GLFW_KEY_SEMICOLON, KeyEqual = GLFW_KEY_EQUAL,
             
-            KeyQ, KeyW, KeyE, KeyR, KeyT,
-            KeyY, KeyU, KeyI, KeyO, KeyP,
-            KeyA, KeyS, KeyD, KeyF, KeyG,
-            KeyH, KeyJ, KeyK, KeyL, KeyZ,
-            KeyX, KeyC, KeyV, KeyB, KeyN,
-            KeyM,
+            KeyA = GLFW_KEY_A, KeyB, KeyC, KeyD,
+            KeyE, KeyF, KeyG, KeyH, KeyI, KeyJ, KeyK,
+            KeyL, KeyM, KeyN, KeyO, KeyP, KeyQ,
+            KeyR, KeyS, KeyT, KeyU, KeyV, KeyW, KeyX,
+            KeyY, KeyZ, KeyLBracket, KeyBSlash,KeyRBracket,
+            KeyGrave = GLFW_KEY_GRAVE_ACCENT,
 
             MouseLeft, MouseRight, MouseB1,
             MouseB2, MouseB3, MouseB4,
