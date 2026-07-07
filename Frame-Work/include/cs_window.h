@@ -1,6 +1,7 @@
 #pragma once
 #include <GLFW/glfw3.h>
 #include "core.h"
+#include "cs_logging.h"
 
 namespace cs
 {
@@ -11,8 +12,13 @@ namespace cs
         Window(const uint32_t& p_width, const uint32_t& p_height, cstring p_title)
             : width(p_width), height(p_height), title(p_title) 
         {
-            glfwInit();
+            if (!glfwInit()) logger::log("Failed to initialize GLFW!", L_CODE::C_ERROR);
             this->window = glfwCreateWindow(this->width, this->height, this->title, nullptr, nullptr);
+            if (!window)
+            {
+                glfwTerminate();
+                logger::log("Failed to create GLFW window!", L_CODE::C_ERROR);
+            }
 
             glfwMakeContextCurrent(this->window);
             glfwSetWindowUserPointer(this->window, this);
@@ -21,10 +27,15 @@ namespace cs
 
         void pollEvents() const { glfwPollEvents(); }
         void swapBuffers() const { glfwSwapBuffers(this->window); }
+        bool shouldClose() const { return glfwWindowShouldClose(this->window); }
 
-        operator GLFWwindow*()
+        GLFWwindow* nativeHandle() const { return this->window; }
+
+        ~Window()
         {
-            return this->window;
+            if (this->window)
+                glfwDestroyWindow(this->window);
+            glfwTerminate();
         }
     private:
         GLFWwindow* window = nullptr;
