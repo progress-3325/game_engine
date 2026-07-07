@@ -146,6 +146,8 @@ namespace cs
         EventType type() const override { return EventType(static_cast<uint16_t>(EventType::EventCategories::Input), 
             static_cast<uint32_t>(EventType::InputEventType::KeyReleasedEvent)); }
         const char* name() const override { return "KeyReleasedEvent"; }
+
+        void execute() const override;
     };
 
     class MouseButtonPressedEvent : public Event
@@ -158,19 +160,9 @@ namespace cs
         }
 
         virtual const char* name() const override { return "MouseButtonPressedEvent"; }
-        uint16_t key{0};
-    };
+        Input::Keys key{0};
 
-    class MouseButtonHoldEvent : public MouseButtonPressedEvent
-    {
-    public:
-        EventType type() const override
-        {
-            return EventType(static_cast<uint16_t>(EventType::EventCategories::Input),
-            static_cast<uint32_t>(EventType::InputEventType::MouseButtonHoldEvent));
-        }
-
-        const char* name() const override { return "MouseButtonHoldEvent"; }
+        virtual void execute() const override;
     };
 
     class MouseButtonReleasedEvent : public MouseButtonPressedEvent
@@ -183,6 +175,8 @@ namespace cs
         }
 
         virtual const char* name() const override { return "MouseButtonReleasedEvent"; }
+
+        void execute() const override;
     };
 
     class MouseMovedEvent : public Event
@@ -355,7 +349,11 @@ namespace cs
             KeyA, KeyS, KeyD, KeyF, KeyG,
             KeyH, KeyJ, KeyK, KeyL, KeyZ,
             KeyX, KeyC, KeyV, KeyB, KeyN,
-            KeyM
+            KeyM,
+
+            MouseLeft, MouseRight, MouseB1,
+            MouseB2, MouseB3, MouseB4,
+            MouseB5
         };
 
         template<Keys key>
