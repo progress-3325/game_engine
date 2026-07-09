@@ -9,7 +9,8 @@
 #define statcast_uint16(val) static_cast<uint16_t>(val)
 #define statcast_uint32(val) static_cast<uint32_t>(val)
 #define stcst_enum(val) statcast_uint32(val)
-static constexpr size_t key_amount = 42;
+static constexpr size_t key_amount = 120;
+static constexpr size_t mouse_button_amount = 8;
 
 namespace cs
 {
@@ -62,6 +63,11 @@ namespace cs
             static std::array<bool, key_amount> is_held;
             static std::array<bool, key_amount> is_released;
             static std::array<Time::stopwatch, key_amount> heldTime;
+
+            static std::array<bool, mouse_button_amount> mouse_is_pressed;
+            static std::array<bool, mouse_button_amount> mouse_is_held;
+            static std::array<bool, mouse_button_amount> mouse_is_released;
+            static std::array<Time::stopwatch, mouse_button_amount> mouse_heldTime;
         };
 
     }
@@ -112,7 +118,7 @@ namespace cs
 
     void MouseButtonPressedEvent::execute() const
     {
-        const auto index = statcast_uint16(this->key);
+        const auto index = statcast_uint16(this->button);
 
         detail::key_pressed::is_pressed[index] = true;
         detail::key_pressed::is_held[index] = true;
@@ -121,7 +127,7 @@ namespace cs
 
     void MouseButtonReleasedEvent::execute() const
     {
-        const auto index = statcast_uint16(this->key);
+        const auto index = statcast_uint16(this->button);
 
         detail::key_pressed::is_held[index] = false;
         detail::key_pressed::is_released[index] = true;
