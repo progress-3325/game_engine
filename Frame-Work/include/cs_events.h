@@ -160,6 +160,8 @@ namespace cs
     class MouseButtonPressedEvent : public Event
     {
     public:
+        MouseButtonPressedEvent() = default;
+        MouseButtonPressedEvent(const Input::MouseButtons& p_button) : button(p_button) {}
         virtual EventType type() const override
         {
             return EventType(static_cast<uint16_t>(EventType::EventCategories::Input),
@@ -167,7 +169,7 @@ namespace cs
         }
 
         virtual const char* name() const override { return "MouseButtonPressedEvent"; }
-        Input::Keys key{0};
+        Input::MouseButtons button{0};
 
         virtual void execute() const override;
     };
@@ -175,6 +177,7 @@ namespace cs
     class MouseButtonReleasedEvent : public MouseButtonPressedEvent
     {
     public:
+        MouseButtonReleasedEvent(const Input::MouseButtons& p_button) : button(p_button) {}
         virtual EventType type() const override
         {
             return EventType(static_cast<uint16_t>(EventType::EventCategories::Input),
@@ -182,6 +185,7 @@ namespace cs
         }
 
         virtual const char* name() const override { return "MouseButtonReleasedEvent"; }
+        Input::MouseButtons button{0};
 
         void execute() const override;
     };
@@ -348,14 +352,16 @@ namespace cs
     {
         enum class Keys : uint16_t
         {
-            KeySpace = GLFW_KEY_SPACE, KeyApostrophe = GLFW_KEY_APOSTROPHE,
+            KeySpace = GLFW_KEY_SPACE, 
+            KeyApostrophe = GLFW_KEY_APOSTROPHE,
             KeyComma = GLFW_KEY_COMMA, KeyDash, KeyPeriod, KeySlash,
 
 
             Key0, Key1, Key2, Key3, Key4,
             Key5, Key6, Key7, Key8, Key9,
 
-            KeySemicolon = GLFW_KEY_SEMICOLON, KeyEqual = GLFW_KEY_EQUAL,
+            KeySemicolon = GLFW_KEY_SEMICOLON, 
+            KeyEqual = GLFW_KEY_EQUAL,
             
             KeyA = GLFW_KEY_A, KeyB, KeyC, KeyD,
             KeyE, KeyF, KeyG, KeyH, KeyI, KeyJ, KeyK,
@@ -364,9 +370,57 @@ namespace cs
             KeyY, KeyZ, KeyLBracket, KeyBSlash,KeyRBracket,
             KeyGrave = GLFW_KEY_GRAVE_ACCENT,
 
-            MouseLeft, MouseRight, MouseB1,
-            MouseB2, MouseB3, MouseB4,
-            MouseB5
+            KeyESC = GLFW_KEY_ESCAPE, KeyEnter, KeyTab,
+            KeyBackspace, KeyInsert, KeyDelete, KeyRight,
+            KeyLeft, KeyDown, KeyUp, KeyPageUp, KeyPageDown,
+            KeyHome, KeyEnd, 
+            
+            KeyCapsLock = GLFW_KEY_CAPS_LOCK,
+            KeyScrollLock, KeyNumLock, KeyPrint, KeyPause,
+            
+            KeyF1 = GLFW_KEY_F1, KeyF2, KeyF3, KeyF4, KeyF5,
+            KeyF6, KeyF7, KeyF8, KeyF9, KeyF10, KeyF11, KeyF12,
+            KeyF13, KeyF14, KeyF15, KeyF16, KeyF17, KeyF18,
+            KeyF19, KeyF20, KeyF21, KeyF22, KeyF23, KeyF24,
+            KeyF25,
+
+            KeyKPDecimal = GLFW_KEY_KP_DECIMAL, KeyKPDivide,
+            KeyKPMultiply, KeyKPSubtract, KeyKPAdd, KeyKPEnter,
+            KeyKPEqual,
+
+            KeyLShift = GLFW_KEY_LEFT_SHIFT, KeyLCTRL,
+            KeyLAlt, LeyLSuper, KeyRShift, KeyRCTRL, KeyRAlt,
+            KeyRSupre, KeyMenu
+        };
+
+        enum class MouseButtons : uint16_t
+        {
+            MouseBLeft = GLFW_MOUSE_BUTTON_LEFT, MouseBRight,
+            MouseBMiddle, MouseB4, MouseB5, MouseB6, MouseB7, 
+            MouseB8
+        };
+
+        enum class JoystickDir : uint16_t
+        {
+            Joy1 = GLFW_JOYSTICK_1, Joy2, Joy3, Joy4,
+            Joy5, Joy6, Joy7, Joy8, Joy9, Joy10, Joy11,
+            Joy12, Joy13, Joy14, Joy15, Joy16
+        };
+
+        enum class GamepadButtons : uint16_t
+        {
+            GamepadBA = GLFW_GAMEPAD_BUTTON_A, GamepadBB, 
+            GamepadBX, GamepadBY, GamepadLBumper, GamepadRBumper,
+            GamepadBack, GamepadStart, GamepadGuide, GamepadLThumb,
+            GamepadRThumb, GamepadDPadUp, GamepadDPadRight,
+            GamepadDPadDown, GamepadDPadLeft
+        };
+
+        enum class GamepadAxis : uint16_t
+        {
+            GamepadAxisLX = GLFW_GAMEPAD_AXIS_LEFT_X, 
+            GamepadAxisLY, GamepadAxisRX, GamepadRY, 
+            GamepadLTrigger, GamepadRTrigger
         };
 
         template<Keys key>
