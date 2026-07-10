@@ -24,6 +24,8 @@ namespace cs
             glfwSetWindowUserPointer(this->window, this);
             glfwSetKeyCallback(this->window, key_callback);
             glfwSetMouseButtonCallback(this->window, mouse_button_callback);
+            glfwSetCursorPosCallback(this->window, mouse_moved_callback);
+            glfwSetScrollCallback(this->window, mouse_scroll_callback);
         }
 
         void pollEvents() const { glfwPollEvents(); }
@@ -47,4 +49,8 @@ namespace cs
     void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
     void mouse_button_callback(GLFWwindow* window, int key, int action, int mods);
+
+    void mouse_moved_callback(GLFWwindow* window, double xPos, double yPos);
+
+    void mouse_scroll_callback(GLFWwindow* window, double xPos, double yPos);
 }

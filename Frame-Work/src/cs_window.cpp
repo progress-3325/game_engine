@@ -43,4 +43,30 @@ namespace cs
         }
     }
 
+    void mouse_moved_callback(GLFWwindow* window, double xPos, double yPos)
+    {
+        static double s_xPos{0.0f}, s_yPos{0.0f};
+        if (xPos != s_xPos || yPos != s_yPos)
+        {
+            s_xPos = xPos;
+            s_yPos = yPos;
+
+            MouseMovedEvent event{xPos, yPos};
+            event.dispatch();
+        }
+    }
+
+
+    void mouse_scroll_callback(GLFWwindow* window, double xPos, double yPos)
+    {
+        static double s_xPos{0.0f}, s_yPos{0.0f};
+        if (xPos != s_xPos || yPos != s_yPos)
+        {
+            s_xPos = xPos;
+            s_yPos = yPos;
+
+            MouseScrollEvent event{xPos, yPos};
+            event.dispatch();
+        }
+    }
 }

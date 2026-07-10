@@ -68,7 +68,10 @@ namespace cs
             static std::array<bool, mouse_button_amount> mouse_is_held;
             static std::array<bool, mouse_button_amount> mouse_is_released;
             static std::array<Time::stopwatch, mouse_button_amount> mouse_heldTime;
+            static f64_t mouse_pos_x, mouse_pos_y, mouse_scroll_x, mouse_scroll_y;
         };
+
+        f64_t key_pressed::mouse_pos_x{0.0f}, key_pressed::mouse_pos_y{0.0f}, key_pressed::mouse_scroll_x{0.0f}, key_pressed::mouse_scroll_y{0.0f};
 
     }
 
@@ -132,6 +135,18 @@ namespace cs
         detail::key_pressed::is_held[index] = false;
         detail::key_pressed::is_released[index] = true;
         detail::key_pressed::heldTime[index].stop();
+    }
+
+    void MouseMovedEvent::execute() const
+    {
+        detail::key_pressed::mouse_pos_x = this->X_axis;
+        detail::key_pressed::mouse_pos_y = this->Y_axis;
+    }
+
+    void MouseScrollEvent::execute() const
+    {
+        detail::key_pressed::mouse_scroll_x = this->position_x;
+        detail::key_pressed::mouse_scroll_y = this->position_y;
     }
 
 

@@ -85,7 +85,7 @@ namespace cs
         virtual ~Event() = 0;
 
         virtual EventType type()   const = 0;
-        virtual const char* name() const = 0;
+        virtual cstring name() const = 0;
         void dispatch();
         virtual void execute()     const = 0;
     };
@@ -97,7 +97,7 @@ namespace cs
             return EventType(static_cast<uint16_t>(EventType::EventCategories::Application),
             static_cast<uint32_t>(EventType::ApplicationEventType::ApplicationCloseEvent));}
         
-        virtual const char* name() const override { return "ApplicationCloseEvent"; }
+        virtual cstring name() const override { return "ApplicationCloseEvent"; }
 
         virtual void execute() const override;
     };
@@ -109,7 +109,7 @@ namespace cs
             return EventType(static_cast<uint16_t>(EventType::EventCategories::Application),
             static_cast<uint32_t>(EventType::ApplicationEventType::ApplicationPauseEvent));}
         
-        const char* name() const override { return "ApplicationPauseEvent"; }
+        cstring name() const override { return "ApplicationPauseEvent"; }
     };
 
     class ApplicationResumeEvent : public Event
@@ -132,7 +132,7 @@ namespace cs
 
         virtual EventType type() const override { return EventType(static_cast<uint16_t>(EventType::EventCategories::Input), 
             static_cast<uint32_t>(EventType::InputEventType::KeyPressedEvent)); }
-        virtual const char* name() const override { return "KeyPressedEvent"; }
+        virtual cstring name() const override { return "KeyPressedEvent"; }
 
         Input::Keys key{0};
 
@@ -150,7 +150,7 @@ namespace cs
         KeyReleasedEvent(const Input::Keys& p_key) : key(p_key) {}
         EventType type() const override { return EventType(static_cast<uint16_t>(EventType::EventCategories::Input), 
             static_cast<uint32_t>(EventType::InputEventType::KeyReleasedEvent)); }
-        const char* name() const override { return "KeyReleasedEvent"; }
+        cstring name() const override { return "KeyReleasedEvent"; }
         
         Input::Keys key{0};
 
@@ -168,7 +168,7 @@ namespace cs
             static_cast<uint32_t>(EventType::InputEventType::MouseButtonPressedEvent));
         }
 
-        virtual const char* name() const override { return "MouseButtonPressedEvent"; }
+        virtual cstring name() const override { return "MouseButtonPressedEvent"; }
         Input::MouseButtons button{0};
 
         virtual void execute() const override;
@@ -184,7 +184,7 @@ namespace cs
             static_cast<uint32_t>(EventType::InputEventType::MouseButtonReleasedEvent));
         }
 
-        virtual const char* name() const override { return "MouseButtonReleasedEvent"; }
+        virtual cstring name() const override { return "MouseButtonReleasedEvent"; }
         Input::MouseButtons button{0};
 
         void execute() const override;
@@ -193,29 +193,35 @@ namespace cs
     class MouseMovedEvent : public Event
     {
     public:
+        MouseMovedEvent(f64_t xPos, f64_t yPos) : X_axis(xPos), Y_axis(yPos) {}
         EventType type() const override
         {
             return EventType(static_cast<uint16_t>(EventType::EventCategories::Input),
             static_cast<uint32_t>(EventType::InputEventType::MouseMovedEvent));
         }
 
-        const char* name() const override { return "MouseMovedEvent"; }
+        cstring name() const override { return "MouseMovedEvent"; }
 
-        f32_t X_axis{0.0f}, Y_axis{0.0f};
+        void execute() const override;
+
+        f64_t X_axis{0.0f}, Y_axis{0.0f};
     };
 
     class MouseScrollEvent : public Event
     {
     public:
+        MouseScrollEvent(f64_t xPos, f64_t yPos) : position_x(xPos), position_y(yPos) {}
         EventType type() const override
         {
             return EventType(static_cast<uint16_t>(EventType::EventCategories::Input),
             static_cast<uint32_t>(EventType::InputEventType::MouseScrollEvent));
         }
         
-        const char* name() const override { return "MouseScrollEvent"; }
+        cstring name() const override { return "MouseScrollEvent"; }
 
-        f32_t position{0.0f};
+        void execute() const override;
+
+        f64_t position_x{0.0f}, position_y{0.0f};
     };
 
     class GamepadConnectedEvent : public Event
@@ -227,7 +233,7 @@ namespace cs
             static_cast<uint32_t>(EventType::InputEventType::GamepadConnectedEvent));
         }
 
-        virtual const char* name() const override { return "GamepadConnectedEvent"; }
+        virtual cstring name() const override { return "GamepadConnectedEvent"; }
 
         std::string profile_name;
     };
@@ -241,7 +247,7 @@ namespace cs
             static_cast<uint32_t>(EventType::InputEventType::GamepadDisconnectedEvent));
         }
 
-        const char* name() const override { return "GamepadDisconnectedEvent"; }
+        cstring name() const override { return "GamepadDisconnectedEvent"; }
 
         std::string reason;
     };
@@ -255,7 +261,7 @@ namespace cs
             static_cast<uint32_t>(EventType::InputEventType::GamepadButtonPressedEvent));
         }
 
-        virtual const char* name() const override { return "GamepadButtonPressedEvent"; }
+        virtual cstring name() const override { return "GamepadButtonPressedEvent"; }
 
         uint16_t button{0};
     };
@@ -269,7 +275,7 @@ namespace cs
             static_cast<uint32_t>(EventType::InputEventType::GamepadButtonHoldEvent));
         }
 
-        const char* name() const override { return "GamepadButtonHoldEvent"; }
+        cstring name() const override { return "GamepadButtonHoldEvent"; }
     };
 
     class GamepadButtonReleasedEvent : public GamepadButtonPressedEvent
@@ -281,7 +287,7 @@ namespace cs
             static_cast<uint32_t>(EventType::InputEventType::GamepadButtonReleasedEvent));
         }
 
-        const char* name() const override { return "GamepadButtonReleasedEvent"; }
+        cstring name() const override { return "GamepadButtonReleasedEvent"; }
     };
 
     class GamepadAxisChangedEvent : public Event
@@ -293,7 +299,7 @@ namespace cs
             static_cast<uint32_t>(EventType::InputEventType::GamepadAxisChangedEvent));
         }
 
-        const char* name() const override { return "GamepadAxisChangedEvent"; }
+        cstring name() const override { return "GamepadAxisChangedEvent"; }
 
         f32_t L_X_axis{0.0f}, L_Y_axis{0.0f},
               R_X_axis{0.0f}, R_Y_axis{0.0f};
@@ -308,7 +314,7 @@ namespace cs
             static_cast<uint32_t>(EventType::SceneEventType::SceneLoadedEvent));
         }
 
-        virtual const char* name() const override { return "SceneLoadedEvent"; }
+        virtual cstring name() const override { return "SceneLoadedEvent"; }
 
 
     };
