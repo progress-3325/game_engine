@@ -6,9 +6,6 @@
 #include <array>
 #include "cs_time.h"
 
-#define statcast_uint16(val) static_cast<uint16_t>(val)
-#define statcast_uint32(val) static_cast<uint32_t>(val)
-#define stcst_enum(val) statcast_uint32(val)
 static constexpr size_t key_amount = 120;
 static constexpr size_t mouse_button_amount = 8;
 
@@ -45,7 +42,7 @@ namespace cs
         for (const std::unique_ptr<Event>& event : detail::ev_storer::events)
         {
             EventType ev_type(event->type());
-            if (ev_type.category == statcast_uint16(EventType::EventCategories::Application))
+            if (ev_type.category == static_cast<uint16_t>(EventType::EventCategories::Application))
             {
                 if (ev_type.type == static_cast<uint32_t>(EventType::ApplicationEventType::ApplicationCloseEvent))
                 {
@@ -79,31 +76,37 @@ namespace cs
     template<Input::Keys key>
     bool Input::isKeyPressed()
     {
-        return detail::key_pressed::is_pressed[static_cast<size_t>(key)];
+        return detail::key_pressed::is_pressed[static_cast<uint16_t>(key)];
     }
 
     template<Input::Keys key>
     bool Input::isKeyHeld()
     {
-        return detail::key_pressed::is_held[static_cast<size_t>(key)];
+        return detail::key_pressed::is_held[static_cast<uint16_t>(key)];
     }
 
     template<Input::Keys key>
     bool Input::isKeyReleased()
     {
-        return detail::key_pressed::is_released[static_cast<size_t>(key)];
+        return detail::key_pressed::is_released[static_cast<uint16_t>(key)];
     }
 
     template<Input::Keys key>
     double Input::keyHeldTime()
     {
-        return detail::key_pressed::heldTime[statcast_uint16(key)].readMilliseconds();
+        return detail::key_pressed::heldTime[static_cast<uint16_t>(key)].readMilliseconds();
+    }
+
+    template<Input::MouseButtons buttons>
+    bool isButtonPressed()
+    {
+        return detail::key_pressed::mouse_is_pressed[static_cast<uint16_t>(button)];
     }
 
 
     void KeyPressedEvent::execute() const
     {
-        const auto index = statcast_uint16(this->key);
+        const auto index = static_cast<uint16_t>(this->key);
 
         detail::key_pressed::is_pressed[index] = true;
         detail::key_pressed::is_held[index] = true;
@@ -112,7 +115,7 @@ namespace cs
 
     void KeyReleasedEvent::execute() const
     {
-        const auto index = statcast_uint16(this->key);
+        const auto index = static_cast<uint16_t>(this->key);
 
         detail::key_pressed::is_held[index] = false;
         detail::key_pressed::heldTime[index].stop();
@@ -121,7 +124,7 @@ namespace cs
 
     void MouseButtonPressedEvent::execute() const
     {
-        const auto index = statcast_uint16(this->button);
+        const auto index = static_cast<uint16_t>(this->button);
 
         detail::key_pressed::is_pressed[index] = true;
         detail::key_pressed::is_held[index] = true;
@@ -130,7 +133,7 @@ namespace cs
 
     void MouseButtonReleasedEvent::execute() const
     {
-        const auto index = statcast_uint16(this->button);
+        const auto index = static_cast<uint16_t>(this->button);
 
         detail::key_pressed::is_held[index] = false;
         detail::key_pressed::is_released[index] = true;
