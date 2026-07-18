@@ -4,6 +4,11 @@
 
 namespace cs
 {
+
+    float Time::delta_time{};
+    double Time::total_time{};
+    std::chrono::steady_clock::time_point Time::frame_timer::m_last_frame{};
+
     void Time::frame_timer::update()
     {
         auto now = std::chrono::steady_clock::now();
