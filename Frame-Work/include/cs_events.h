@@ -70,20 +70,96 @@ namespace cs
 
         };
     };
-    class EventDispatcher
+
+    namespace Input
     {
-    public:
-        static void dispatch(Event*);
-        static void process();
-    private:
-        static Mutex m_lock;
-    };
+        enum class Keys : uint16_t
+        {
+            KeySpace = GLFW_KEY_SPACE, 
+            KeyApostrophe = GLFW_KEY_APOSTROPHE,
+            KeyComma = GLFW_KEY_COMMA, KeyDash, KeyPeriod, KeySlash,
+
+
+            Key0, Key1, Key2, Key3, Key4,
+            Key5, Key6, Key7, Key8, Key9,
+
+            KeySemicolon = GLFW_KEY_SEMICOLON, 
+            KeyEqual = GLFW_KEY_EQUAL,
+            
+            KeyA = GLFW_KEY_A, KeyB, KeyC, KeyD,
+            KeyE, KeyF, KeyG, KeyH, KeyI, KeyJ, KeyK,
+            KeyL, KeyM, KeyN, KeyO, KeyP, KeyQ,
+            KeyR, KeyS, KeyT, KeyU, KeyV, KeyW, KeyX,
+            KeyY, KeyZ, KeyLBracket, KeyBSlash,KeyRBracket,
+            KeyGrave = GLFW_KEY_GRAVE_ACCENT,
+
+            KeyESC = GLFW_KEY_ESCAPE, KeyEnter, KeyTab,
+            KeyBackspace, KeyInsert, KeyDelete, KeyRight,
+            KeyLeft, KeyDown, KeyUp, KeyPageUp, KeyPageDown,
+            KeyHome, KeyEnd, 
+            
+            KeyCapsLock = GLFW_KEY_CAPS_LOCK,
+            KeyScrollLock, KeyNumLock, KeyPrint, KeyPause,
+            
+            KeyF1 = GLFW_KEY_F1, KeyF2, KeyF3, KeyF4, KeyF5,
+            KeyF6, KeyF7, KeyF8, KeyF9, KeyF10, KeyF11, KeyF12,
+            KeyF13, KeyF14, KeyF15, KeyF16, KeyF17, KeyF18,
+            KeyF19, KeyF20, KeyF21, KeyF22, KeyF23, KeyF24,
+            KeyF25,
+
+            KeyKPDecimal = GLFW_KEY_KP_DECIMAL, KeyKPDivide,
+            KeyKPMultiply, KeyKPSubtract, KeyKPAdd, KeyKPEnter,
+            KeyKPEqual,
+
+            KeyLShift = GLFW_KEY_LEFT_SHIFT, KeyLCTRL,
+            KeyLAlt, LeyLSuper, KeyRShift, KeyRCTRL, KeyRAlt,
+            KeyRSupre, KeyMenu
+        };
+
+        enum class MouseButtons : uint16_t
+        {
+            MouseBLeft = GLFW_MOUSE_BUTTON_LEFT, MouseBRight,
+            MouseBMiddle, MouseB4, MouseB5, MouseB6, MouseB7, 
+            MouseB8
+        };
+
+        enum class JoystickDir : uint16_t
+        {
+            Joy1 = GLFW_JOYSTICK_1, Joy2, Joy3, Joy4,
+            Joy5, Joy6, Joy7, Joy8, Joy9, Joy10, Joy11,
+            Joy12, Joy13, Joy14, Joy15, Joy16
+        };
+
+        enum class GamepadButtons : uint16_t
+        {
+            GamepadBA = GLFW_GAMEPAD_BUTTON_A, GamepadBB, 
+            GamepadBX, GamepadBY, GamepadLBumper, GamepadRBumper,
+            GamepadBack, GamepadStart, GamepadGuide, GamepadLThumb,
+            GamepadRThumb, GamepadDPadUp, GamepadDPadRight,
+            GamepadDPadDown, GamepadDPadLeft
+        };
+
+        enum class GamepadAxis : uint16_t
+        {
+            GamepadAxisLX = GLFW_GAMEPAD_AXIS_LEFT_X, 
+            GamepadAxisLY, GamepadAxisRX, GamepadRY, 
+            GamepadLTrigger, GamepadRTrigger
+        };
+
+        template<Keys key>
+        bool isKeyPressed();
+        template<Keys key>
+        bool isKeyHeld();
+        template<Keys key>
+        bool isKeyReleased();
+        template<Keys key>
+        double keyHeldTime();
+    }
 
     class Event
     {
     public:
-        virtual ~Event() = 0;
-
+        virtual ~Event() = default;
         virtual EventType type()   const = 0;
         virtual cstring name() const = 0;
         void dispatch();
@@ -324,118 +400,23 @@ namespace cs
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-    namespace App
+    class EventDispatcher
     {
-        class Closed
-        {
-        public:
-            Closed(std::unique_ptr<ApplicationCloseEvent> ev)
-            {
-                closed = true;
-                closed_time = std::chrono::steady_clock::now();
-            }
-
-            std::string closed_time_str() const { return Time::get_time_str(closed_time); }
-
-        private:
-            bool closed{false};
-            Time::TimePoint closed_time;
-        };
-    }
-
-    namespace Input
-    {
-        enum class Keys : uint16_t
-        {
-            KeySpace = GLFW_KEY_SPACE, 
-            KeyApostrophe = GLFW_KEY_APOSTROPHE,
-            KeyComma = GLFW_KEY_COMMA, KeyDash, KeyPeriod, KeySlash,
+    public:
+        static void dispatch(Event*);
+        static void process();
+    private:
+        static Mutex m_lock;
+    };
 
 
-            Key0, Key1, Key2, Key3, Key4,
-            Key5, Key6, Key7, Key8, Key9,
 
-            KeySemicolon = GLFW_KEY_SEMICOLON, 
-            KeyEqual = GLFW_KEY_EQUAL,
-            
-            KeyA = GLFW_KEY_A, KeyB, KeyC, KeyD,
-            KeyE, KeyF, KeyG, KeyH, KeyI, KeyJ, KeyK,
-            KeyL, KeyM, KeyN, KeyO, KeyP, KeyQ,
-            KeyR, KeyS, KeyT, KeyU, KeyV, KeyW, KeyX,
-            KeyY, KeyZ, KeyLBracket, KeyBSlash,KeyRBracket,
-            KeyGrave = GLFW_KEY_GRAVE_ACCENT,
 
-            KeyESC = GLFW_KEY_ESCAPE, KeyEnter, KeyTab,
-            KeyBackspace, KeyInsert, KeyDelete, KeyRight,
-            KeyLeft, KeyDown, KeyUp, KeyPageUp, KeyPageDown,
-            KeyHome, KeyEnd, 
-            
-            KeyCapsLock = GLFW_KEY_CAPS_LOCK,
-            KeyScrollLock, KeyNumLock, KeyPrint, KeyPause,
-            
-            KeyF1 = GLFW_KEY_F1, KeyF2, KeyF3, KeyF4, KeyF5,
-            KeyF6, KeyF7, KeyF8, KeyF9, KeyF10, KeyF11, KeyF12,
-            KeyF13, KeyF14, KeyF15, KeyF16, KeyF17, KeyF18,
-            KeyF19, KeyF20, KeyF21, KeyF22, KeyF23, KeyF24,
-            KeyF25,
 
-            KeyKPDecimal = GLFW_KEY_KP_DECIMAL, KeyKPDivide,
-            KeyKPMultiply, KeyKPSubtract, KeyKPAdd, KeyKPEnter,
-            KeyKPEqual,
 
-            KeyLShift = GLFW_KEY_LEFT_SHIFT, KeyLCTRL,
-            KeyLAlt, LeyLSuper, KeyRShift, KeyRCTRL, KeyRAlt,
-            KeyRSupre, KeyMenu
-        };
 
-        enum class MouseButtons : uint16_t
-        {
-            MouseBLeft = GLFW_MOUSE_BUTTON_LEFT, MouseBRight,
-            MouseBMiddle, MouseB4, MouseB5, MouseB6, MouseB7, 
-            MouseB8
-        };
 
-        enum class JoystickDir : uint16_t
-        {
-            Joy1 = GLFW_JOYSTICK_1, Joy2, Joy3, Joy4,
-            Joy5, Joy6, Joy7, Joy8, Joy9, Joy10, Joy11,
-            Joy12, Joy13, Joy14, Joy15, Joy16
-        };
 
-        enum class GamepadButtons : uint16_t
-        {
-            GamepadBA = GLFW_GAMEPAD_BUTTON_A, GamepadBB, 
-            GamepadBX, GamepadBY, GamepadLBumper, GamepadRBumper,
-            GamepadBack, GamepadStart, GamepadGuide, GamepadLThumb,
-            GamepadRThumb, GamepadDPadUp, GamepadDPadRight,
-            GamepadDPadDown, GamepadDPadLeft
-        };
 
-        enum class GamepadAxis : uint16_t
-        {
-            GamepadAxisLX = GLFW_GAMEPAD_AXIS_LEFT_X, 
-            GamepadAxisLY, GamepadAxisRX, GamepadRY, 
-            GamepadLTrigger, GamepadRTrigger
-        };
-
-        template<Keys key>
-        bool isKeyPressed();
-        template<Keys key>
-        bool isKeyHeld();
-        template<Keys key>
-        bool isKeyReleased();
-        template<Keys key>
-        double keyHeldTime();
-    }
+    
 }
