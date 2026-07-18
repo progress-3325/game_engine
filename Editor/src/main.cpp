@@ -19,5 +19,7 @@ int main()
         cs::EventDispatcher::process();
     }
 
+    glfwTerminate();
+
     return 0;
 }
