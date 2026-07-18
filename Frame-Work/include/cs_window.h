@@ -5,6 +5,14 @@
 
 namespace cs
 {
+    void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+    void mouse_button_callback(GLFWwindow* window, int key, int action, int mods);
+
+    void mouse_moved_callback(GLFWwindow* window, double xPos, double yPos);
+
+    void mouse_scroll_callback(GLFWwindow* window, double xPos, double yPos);
+
     class Window
     {
     public:
@@ -43,14 +51,6 @@ namespace cs
     private:
         GLFWwindow* window = nullptr;
         uint32_t width{0}, height{0};
-        cstring title{'\0'};
+        cstring title{""};
     };
-
-    void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-
-    void mouse_button_callback(GLFWwindow* window, int key, int action, int mods);
-
-    void mouse_moved_callback(GLFWwindow* window, double xPos, double yPos);
-
-    void mouse_scroll_callback(GLFWwindow* window, double xPos, double yPos);
 }
