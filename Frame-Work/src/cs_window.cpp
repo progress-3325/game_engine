@@ -9,14 +9,12 @@ namespace cs
         {
             case GLFW_PRESS:
             {
-                KeyPressedEvent event{static_cast<Input::Keys>(key)};
-                event.dispatch();
+                (new KeyPressedEvent(static_cast<Input::Keys>(key)))->dispatch();
                 break;
             }
             case GLFW_RELEASE:
             {
-                KeyReleasedEvent event{static_cast<Input::Keys>(key)};
-                event.dispatch();
+                (new KeyReleasedEvent(static_cast<Input::Keys>(key)))->dispatch();
                 break;
             }
             default: break;
@@ -29,14 +27,12 @@ namespace cs
         {
             case GLFW_PRESS:
             {
-                MouseButtonPressedEvent event{static_cast<Input::MouseButtons>(key)};
-                event.dispatch();
+                (new MouseButtonPressedEvent(static_cast<Input::MouseButtons>(key)))->dispatch();
                 break;
             }
             case GLFW_RELEASE:
             {
-                MouseButtonReleasedEvent event{static_cast<Input::MouseButtons>(key)};
-                event.dispatch();
+                (new MouseButtonReleasedEvent(static_cast<Input::MouseButtons>(key)))->dispatch();
                 break;
             }
             default: break;
@@ -51,8 +47,7 @@ namespace cs
             s_xPos = xPos;
             s_yPos = yPos;
 
-            MouseMovedEvent event{xPos, yPos};
-            event.dispatch();
+            (new MouseMovedEvent(xPos, yPos))->dispatch();
         }
     }
 
@@ -65,8 +60,7 @@ namespace cs
             s_xPos = xPos;
             s_yPos = yPos;
 
-            MouseScrollEvent event{xPos, yPos};
-            event.dispatch();
+            (new MouseScrollEvent(xPos, yPos))->dispatch();
         }
     }
 }
