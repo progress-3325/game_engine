@@ -3,6 +3,7 @@
 #include "cs_threading.h"
 #include "cs_time.h"
 #include <string>
+#include <GLFW/glfw3.h>
 
 namespace cs
 {
@@ -69,22 +70,98 @@ namespace cs
 
         };
     };
-    class EventDispatcher
+
+    namespace Input
     {
-    public:
-        static void dispatch(Event*);
-        static void process();
-    private:
-        static Mutex m_lock;
-    };
+        enum class Keys : uint16_t
+        {
+            KeySpace = GLFW_KEY_SPACE, 
+            KeyApostrophe = GLFW_KEY_APOSTROPHE,
+            KeyComma = GLFW_KEY_COMMA, KeyDash, KeyPeriod, KeySlash,
+
+
+            Key0, Key1, Key2, Key3, Key4,
+            Key5, Key6, Key7, Key8, Key9,
+
+            KeySemicolon = GLFW_KEY_SEMICOLON, 
+            KeyEqual = GLFW_KEY_EQUAL,
+            
+            KeyA = GLFW_KEY_A, KeyB, KeyC, KeyD,
+            KeyE, KeyF, KeyG, KeyH, KeyI, KeyJ, KeyK,
+            KeyL, KeyM, KeyN, KeyO, KeyP, KeyQ,
+            KeyR, KeyS, KeyT, KeyU, KeyV, KeyW, KeyX,
+            KeyY, KeyZ, KeyLBracket, KeyBSlash,KeyRBracket,
+            KeyGrave = GLFW_KEY_GRAVE_ACCENT,
+
+            KeyESC = GLFW_KEY_ESCAPE, KeyEnter, KeyTab,
+            KeyBackspace, KeyInsert, KeyDelete, KeyRight,
+            KeyLeft, KeyDown, KeyUp, KeyPageUp, KeyPageDown,
+            KeyHome, KeyEnd, 
+            
+            KeyCapsLock = GLFW_KEY_CAPS_LOCK,
+            KeyScrollLock, KeyNumLock, KeyPrint, KeyPause,
+            
+            KeyF1 = GLFW_KEY_F1, KeyF2, KeyF3, KeyF4, KeyF5,
+            KeyF6, KeyF7, KeyF8, KeyF9, KeyF10, KeyF11, KeyF12,
+            KeyF13, KeyF14, KeyF15, KeyF16, KeyF17, KeyF18,
+            KeyF19, KeyF20, KeyF21, KeyF22, KeyF23, KeyF24,
+            KeyF25,
+
+            KeyKPDecimal = GLFW_KEY_KP_DECIMAL, KeyKPDivide,
+            KeyKPMultiply, KeyKPSubtract, KeyKPAdd, KeyKPEnter,
+            KeyKPEqual,
+
+            KeyLShift = GLFW_KEY_LEFT_SHIFT, KeyLCTRL,
+            KeyLAlt, LeyLSuper, KeyRShift, KeyRCTRL, KeyRAlt,
+            KeyRSupre, KeyMenu
+        };
+
+        enum class MouseButtons : uint16_t
+        {
+            MouseBLeft = GLFW_MOUSE_BUTTON_LEFT, MouseBRight,
+            MouseBMiddle, MouseB4, MouseB5, MouseB6, MouseB7, 
+            MouseB8
+        };
+
+        enum class JoystickDir : uint16_t
+        {
+            Joy1 = GLFW_JOYSTICK_1, Joy2, Joy3, Joy4,
+            Joy5, Joy6, Joy7, Joy8, Joy9, Joy10, Joy11,
+            Joy12, Joy13, Joy14, Joy15, Joy16
+        };
+
+        enum class GamepadButtons : uint16_t
+        {
+            GamepadBA = GLFW_GAMEPAD_BUTTON_A, GamepadBB, 
+            GamepadBX, GamepadBY, GamepadLBumper, GamepadRBumper,
+            GamepadBack, GamepadStart, GamepadGuide, GamepadLThumb,
+            GamepadRThumb, GamepadDPadUp, GamepadDPadRight,
+            GamepadDPadDown, GamepadDPadLeft
+        };
+
+        enum class GamepadAxis : uint16_t
+        {
+            GamepadAxisLX = GLFW_GAMEPAD_AXIS_LEFT_X, 
+            GamepadAxisLY, GamepadAxisRX, GamepadRY, 
+            GamepadLTrigger, GamepadRTrigger
+        };
+
+        template<Keys key>
+        bool isKeyPressed();
+        template<Keys key>
+        bool isKeyHeld();
+        template<Keys key>
+        bool isKeyReleased();
+        template<Keys key>
+        double keyHeldTime();
+    }
 
     class Event
     {
     public:
-        virtual ~Event() = 0;
-
+        virtual ~Event() = default;
         virtual EventType type()   const = 0;
-        virtual const char* name() const = 0;
+        virtual cstring name() const = 0;
         void dispatch();
         virtual void execute()     const = 0;
     };
@@ -96,7 +173,7 @@ namespace cs
             return EventType(static_cast<uint16_t>(EventType::EventCategories::Application),
             static_cast<uint32_t>(EventType::ApplicationEventType::ApplicationCloseEvent));}
         
-        virtual const char* name() const override { return "ApplicationCloseEvent"; }
+        virtual cstring name() const override { return "ApplicationCloseEvent"; }
 
         virtual void execute() const override;
     };
@@ -108,7 +185,7 @@ namespace cs
             return EventType(static_cast<uint16_t>(EventType::EventCategories::Application),
             static_cast<uint32_t>(EventType::ApplicationEventType::ApplicationPauseEvent));}
         
-        const char* name() const override { return "ApplicationPauseEvent"; }
+        cstring name() const override { return "ApplicationPauseEvent"; }
     };
 
     class ApplicationResumeEvent : public Event
@@ -126,9 +203,12 @@ namespace cs
     class KeyPressedEvent : public Event
     {
     public:
+        KeyPressedEvent() = default;
+        KeyPressedEvent(const Input::Keys& p_key) : key(p_key) {}
+
         virtual EventType type() const override { return EventType(static_cast<uint16_t>(EventType::EventCategories::Input), 
             static_cast<uint32_t>(EventType::InputEventType::KeyPressedEvent)); }
-        virtual const char* name() const override { return "KeyPressedEvent"; }
+        virtual cstring name() const override { return "KeyPressedEvent"; }
 
         Input::Keys key{0};
 
@@ -143,9 +223,12 @@ namespace cs
     class KeyReleasedEvent : public KeyPressedEvent
     {
     public:
+        KeyReleasedEvent(const Input::Keys& p_key) : key(p_key) {}
         EventType type() const override { return EventType(static_cast<uint16_t>(EventType::EventCategories::Input), 
             static_cast<uint32_t>(EventType::InputEventType::KeyReleasedEvent)); }
-        const char* name() const override { return "KeyReleasedEvent"; }
+        cstring name() const override { return "KeyReleasedEvent"; }
+        
+        Input::Keys key{0};
 
         void execute() const override;
     };
@@ -153,14 +236,16 @@ namespace cs
     class MouseButtonPressedEvent : public Event
     {
     public:
+        MouseButtonPressedEvent() = default;
+        MouseButtonPressedEvent(const Input::MouseButtons& p_button) : button(p_button) {}
         virtual EventType type() const override
         {
             return EventType(static_cast<uint16_t>(EventType::EventCategories::Input),
             static_cast<uint32_t>(EventType::InputEventType::MouseButtonPressedEvent));
         }
 
-        virtual const char* name() const override { return "MouseButtonPressedEvent"; }
-        Input::Keys key{0};
+        virtual cstring name() const override { return "MouseButtonPressedEvent"; }
+        Input::MouseButtons button{0};
 
         virtual void execute() const override;
     };
@@ -168,13 +253,15 @@ namespace cs
     class MouseButtonReleasedEvent : public MouseButtonPressedEvent
     {
     public:
+        MouseButtonReleasedEvent(const Input::MouseButtons& p_button) : button(p_button) {}
         virtual EventType type() const override
         {
             return EventType(static_cast<uint16_t>(EventType::EventCategories::Input),
             static_cast<uint32_t>(EventType::InputEventType::MouseButtonReleasedEvent));
         }
 
-        virtual const char* name() const override { return "MouseButtonReleasedEvent"; }
+        virtual cstring name() const override { return "MouseButtonReleasedEvent"; }
+        Input::MouseButtons button{0};
 
         void execute() const override;
     };
@@ -182,29 +269,35 @@ namespace cs
     class MouseMovedEvent : public Event
     {
     public:
+        MouseMovedEvent(f64_t xPos, f64_t yPos) : X_axis(xPos), Y_axis(yPos) {}
         EventType type() const override
         {
             return EventType(static_cast<uint16_t>(EventType::EventCategories::Input),
             static_cast<uint32_t>(EventType::InputEventType::MouseMovedEvent));
         }
 
-        const char* name() const override { return "MouseMovedEvent"; }
+        cstring name() const override { return "MouseMovedEvent"; }
 
-        f32_t X_axis{0.0f}, Y_axis{0.0f};
+        void execute() const override;
+
+        f64_t X_axis{0.0f}, Y_axis{0.0f};
     };
 
     class MouseScrollEvent : public Event
     {
     public:
+        MouseScrollEvent(f64_t xPos, f64_t yPos) : position_x(xPos), position_y(yPos) {}
         EventType type() const override
         {
             return EventType(static_cast<uint16_t>(EventType::EventCategories::Input),
             static_cast<uint32_t>(EventType::InputEventType::MouseScrollEvent));
         }
         
-        const char* name() const override { return "MouseScrollEvent"; }
+        cstring name() const override { return "MouseScrollEvent"; }
 
-        f32_t position{0.0f};
+        void execute() const override;
+
+        f64_t position_x{0.0f}, position_y{0.0f};
     };
 
     class GamepadConnectedEvent : public Event
@@ -216,7 +309,7 @@ namespace cs
             static_cast<uint32_t>(EventType::InputEventType::GamepadConnectedEvent));
         }
 
-        virtual const char* name() const override { return "GamepadConnectedEvent"; }
+        virtual cstring name() const override { return "GamepadConnectedEvent"; }
 
         std::string profile_name;
     };
@@ -230,7 +323,7 @@ namespace cs
             static_cast<uint32_t>(EventType::InputEventType::GamepadDisconnectedEvent));
         }
 
-        const char* name() const override { return "GamepadDisconnectedEvent"; }
+        cstring name() const override { return "GamepadDisconnectedEvent"; }
 
         std::string reason;
     };
@@ -244,7 +337,7 @@ namespace cs
             static_cast<uint32_t>(EventType::InputEventType::GamepadButtonPressedEvent));
         }
 
-        virtual const char* name() const override { return "GamepadButtonPressedEvent"; }
+        virtual cstring name() const override { return "GamepadButtonPressedEvent"; }
 
         uint16_t button{0};
     };
@@ -258,7 +351,7 @@ namespace cs
             static_cast<uint32_t>(EventType::InputEventType::GamepadButtonHoldEvent));
         }
 
-        const char* name() const override { return "GamepadButtonHoldEvent"; }
+        cstring name() const override { return "GamepadButtonHoldEvent"; }
     };
 
     class GamepadButtonReleasedEvent : public GamepadButtonPressedEvent
@@ -270,7 +363,7 @@ namespace cs
             static_cast<uint32_t>(EventType::InputEventType::GamepadButtonReleasedEvent));
         }
 
-        const char* name() const override { return "GamepadButtonReleasedEvent"; }
+        cstring name() const override { return "GamepadButtonReleasedEvent"; }
     };
 
     class GamepadAxisChangedEvent : public Event
@@ -282,7 +375,7 @@ namespace cs
             static_cast<uint32_t>(EventType::InputEventType::GamepadAxisChangedEvent));
         }
 
-        const char* name() const override { return "GamepadAxisChangedEvent"; }
+        cstring name() const override { return "GamepadAxisChangedEvent"; }
 
         f32_t L_X_axis{0.0f}, L_Y_axis{0.0f},
               R_X_axis{0.0f}, R_Y_axis{0.0f};
@@ -297,9 +390,23 @@ namespace cs
             static_cast<uint32_t>(EventType::SceneEventType::SceneLoadedEvent));
         }
 
-        virtual const char* name() const override { return "SceneLoadedEvent"; }
+        virtual cstring name() const override { return "SceneLoadedEvent"; }
 
 
+    };
+
+
+
+
+
+
+    class EventDispatcher
+    {
+    public:
+        static void dispatch(Event*);
+        static void process();
+    private:
+        static Mutex m_lock;
     };
 
 
@@ -311,58 +418,5 @@ namespace cs
 
 
 
-
-
-
-
-
-
-
-    namespace App
-    {
-        class Closed
-        {
-        public:
-            Closed(std::unique_ptr<ApplicationCloseEvent> ev)
-            {
-                closed = true;
-                closed_time = std::chrono::steady_clock::now();
-            }
-
-            std::string closed_time_str() const { return Time::get_time_str(closed_time); }
-
-        private:
-            bool closed{false};
-            Time::TimePoint closed_time;
-        };
-    }
-
-    namespace Input
-    {
-        enum class Keys : uint16_t
-        {
-            Key0 = 0, Key1, Key2, Key3, Key4,
-            Key5, Key6, Key7, Key8, Key9,
-            
-            KeyQ, KeyW, KeyE, KeyR, KeyT,
-            KeyY, KeyU, KeyI, KeyO, KeyP,
-            KeyA, KeyS, KeyD, KeyF, KeyG,
-            KeyH, KeyJ, KeyK, KeyL, KeyZ,
-            KeyX, KeyC, KeyV, KeyB, KeyN,
-            KeyM,
-
-            MouseLeft, MouseRight, MouseB1,
-            MouseB2, MouseB3, MouseB4,
-            MouseB5
-        };
-
-        template<Keys key>
-        bool isKeyPressed();
-        template<Keys key>
-        bool isKeyHeld();
-        template<Keys key>
-        bool isKeyReleased();
-        template<Keys key>
-        double keyHeldTime();
-    }
+    
 }

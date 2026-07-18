@@ -14,4 +14,6 @@ namespace cs
 
     using f32_t = float;
     using f64_t = double;
+
+    using cstring = const char*;
 }

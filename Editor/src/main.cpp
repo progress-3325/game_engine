@@ -1,5 +1,6 @@
 #include "cs_logging.h"
-#include "application.h"
+#include "cs_window.h"
+#include "cs_events.h"
 
 int main()
 {
@@ -7,8 +8,18 @@ int main()
     cs::logger::log("This is a warning message.", cs::L_CODE::C_WARN);
     cs::logger::log("This is a debug message.", cs::L_CODE::C_DEBUG);
     
-    Application::run();
-    cs::logger::log("This is an error message.", cs::L_CODE::C_ERROR);
+    cs::logger::log("This is an error message.", cs::L_CODE::C_ERROR_CONTINUE);
     
+    cs::Window window{1000, 800, "Title"};
+
+    while (!window.shouldClose())
+    {
+        window.pollEvents();
+        window.swapBuffers();
+        cs::EventDispatcher::process();
+    }
+
+    glfwTerminate();
+
     return 0;
 }
